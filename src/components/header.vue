@@ -7,10 +7,10 @@
       
       <h2 class="md-title" style="flex: 1">Hajime Tools</h2>
       
-      <md-button>メモ</md-button>
-      <md-button>マイクラ</md-button>
-      <md-button>カケイボ</md-button>
-      
+      <router-link to="/" class="md-button">メモ</router-link>
+      <router-link to="/minecraft" class="md-button">マイクラ</router-link>
+      <router-link to="/house" class="md-button">カケイボ</router-link>
+      <router-link to="/kpt" class="md-button">KPT</router-link>
     </md-toolbar>
     
     <md-sidenav class="md-left" ref="sidenav">
