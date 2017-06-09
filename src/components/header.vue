@@ -13,6 +13,8 @@
       <router-link to="/kpt" class="md-button">KPT</router-link>
     </md-toolbar>
     
+    <login></login>
+    
     <md-sidenav class="md-left" ref="sidenav">
       <md-toolbar class="md-account-header">
         <h1>一覧</h1>
