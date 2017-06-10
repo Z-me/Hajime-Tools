@@ -10,7 +10,7 @@
       <button class="md-button" v-on:click="showLogin = true">LOGIN</button>
       
       <router-link to="/" class="md-button">メモ</router-link>
-      <router-link to="/minecraft" class="md-button">マイクラ</router-link>
+      <router-link to="/health" class="md-button">ケンコー</router-link>
       <router-link to="/house" class="md-button">カケイボ</router-link>
       <router-link to="/kpt" class="md-button">KPT</router-link>
     </md-toolbar>
@@ -22,15 +22,27 @@
       <md-list>
         <md-list-item>
           <md-avatar>
-            <img src="https://irec.jp/images/upfile/icon-microphone01.png" alt="People">
+            <img src="https://irec.jp/images/upfile/icon-microphone01.png" alt="Memo">
           </md-avatar>
           <md-button>Voice Memo</md-button>
         </md-list-item>
         <md-list-item>
           <md-avatar>
-            <img src="http://is1.mzstatic.com/image/thumb/Purple127/v4/97/59/5f/97595f13-e668-dcc5-69df-441c4d798a91/source/1200x630bb.jpg" alt="People">
+            <img src="http://icon-rainbow.com/i/icon_03300/icon_033000_256.jpg" alt="Health">
           </md-avatar>
-          <md-button>Minecraft</md-button>
+          <md-button>ケンコー</md-button>
+        </md-list-item>
+        <md-list-item>
+          <md-avatar>
+            <img src="http://iconhoihoi.oops.jp/sozai/icon/68-money2/icon_3g_192.png" alt="KAKEIBO">
+          </md-avatar>
+          <md-button>カケイボ</md-button>
+        </md-list-item>
+        <md-list-item>
+          <md-avatar>
+            <img src="http://timekrei.tenda.co.jp/colume/images/columepic03.jpg" alt="Health">
+          </md-avatar>
+          <md-button>KPT</md-button>
         </md-list-item>
       </md-list>
     </md-sidenav>

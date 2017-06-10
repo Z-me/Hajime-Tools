@@ -1,6 +1,6 @@
 <template>
-  <div class="MineCraft">
-    <h1>マイクラ</h1>
+  <div class="Health">
+    <h1>タイジューケー</h1>
     <VoiceInput></VoiceInput>
   </div>
 </template>
@@ -8,7 +8,7 @@
 <script>
 import VoiceInput from '@/components/Voice_input'
 export default {
-  name: 'MineCraft',
+  name: 'Health',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
