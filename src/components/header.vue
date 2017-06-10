@@ -7,13 +7,13 @@
       
       <h2 class="md-title" style="flex: 1">Hajime Tools</h2>
       
+      <button class="md-button" v-on:click="showLogin = true">LOGIN</button>
+      
       <router-link to="/" class="md-button">メモ</router-link>
       <router-link to="/minecraft" class="md-button">マイクラ</router-link>
       <router-link to="/house" class="md-button">カケイボ</router-link>
       <router-link to="/kpt" class="md-button">KPT</router-link>
     </md-toolbar>
-    
-    <login></login>
     
     <md-sidenav class="md-left" ref="sidenav">
       <md-toolbar class="md-account-header">
@@ -34,24 +34,54 @@
         </md-list-item>
       </md-list>
     </md-sidenav>
+    
+    <Modal v-if="showLogin" @close="showLogin = false">
+      <h2 slot="header">Login</h2>
+      <Login slot="body"></Login>
+      <div slot="footer">
+        <md-button class="md-raised md-primary">Login</md-button>
+        <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
+        <button class="md-button md-raised md-warn" v-on:click="showLogin = false">
+          モドル
+        </button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'header'
+import Modal from '@/components/Modal'
+import Login from '@/components/Login'
+export default {
+  name: 'header',
+  components: {
+    Modal,
+    Login
+  },
+  data () {
+    return {
+      showLogin: false
+    }
+  },
+  methods: {
+    open: function (which, e) {
+      e.preventDefault()
+      if (Modal.active !== null) {
+        document.getelementbyid('form-' + Modal.active).removeClass('active')
+        document.getelementbyid(Modal.active + '-form').removeClass('active')
+      }
+      document.getelementbyid('login-modal').addClass('active')
+      document.getelementbyid('form-' + which).addClass('active')
+      document.getelementbyid(which + '-form').addClass('active')
+      Modal.active = which
+    }
   }
+}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .main-content {
-    padding: 0px;
-    margin: 0px;
-  }
-  
-  .menue {
-    float: right;
-  }
-
+.header {
+  text-align: center;
+  color: #42b983 !important;
+}
 </style>

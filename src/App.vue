@@ -3,20 +3,16 @@
     <Header></Header>
     <div class="main-content">
       <router-view></router-view>
-      <button id="showModal" @click="showModal = true">login</button>
-      <Login v-if="showModal" @close="showModal = false"></Login>
     </div>
   </div>
 </template>
 
 <script>
-import Header from '@/components/header'
-import Login from '@/components/login'
+import Header from '@/components/Header'
 export default {
   name: 'app',
   components: {
-    Header,
-    Login
+    Header
   }
 }
 </script>

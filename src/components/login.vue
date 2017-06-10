@@ -1,49 +1,23 @@
 <template>
-  <div class="Login">
-    <div class="modal-container">
-      <div class="modal-header">
-        <slot name="header">
-          default header
-        </slot>
-      </div>
-      <div class="modal-body">
-        <slot name="body">
-          default body
-        </slot>
-      </div>
-      <div class="modal-footer">
-        <slot name="footer">
-          default footer
-          <button class="modal-default-button" @click="$emit('close')">
-            OK
-          </button>
-        </slot>
-      </div>
-    </div>
+  <div id="login">
+    <md-input-container>
+      <label>ユーザ メイ</label>
+      <md-input required></md-input>
+      <span class="md-error">Validation message</span>
+    </md-input-container>
+    <md-input-container md-has-password>
+      <label>パスワード</label>
+      <md-input type="password"></md-input>
+    </md-input-container>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Login',
-  data () {
-    return {
-      name: '',
-      password: '',
-      showModal: false
-    }
-  },
-  props: [
-    'show'
-  ],
-  methods: {
-    hideModal: function () {
-      this.show = false
-    }
-  }
+  name: 'login'
 }
 </script>
 
 <style scoped>
-  
+
 </style>

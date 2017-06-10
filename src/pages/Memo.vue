@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import VoiceInput from '@/components/voice_input'
+import VoiceInput from '@/components/Voice_input'
 export default {
   name: 'hello',
   data () {
