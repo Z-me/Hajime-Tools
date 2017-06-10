@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Memo from '@/pages/Memo'
 import House from '@/pages/HouseholdAccountBook'
-import MineCraft from '@/pages/MineCraft'
+import Health from '@/pages/Health'
 import KPT from '@/pages/KPT'
 
 Vue.use(Router)
@@ -15,9 +15,9 @@ export default new Router({
       component: Memo
     },
     {
-      path: '/minecraft',
-      name: 'MineCraft',
-      component: MineCraft
+      path: '/health',
+      name: 'Health',
+      component: Health
     },
     {
       path: '/house',
