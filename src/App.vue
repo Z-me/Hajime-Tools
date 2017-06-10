@@ -1,12 +1,14 @@
 <template>
   <div id="app">
     <Header></Header>
-    <router-view></router-view>
+    <div class="main-content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
-import Header from '@/components/header'
+import Header from '@/components/Header'
 export default {
   name: 'app',
   components: {
@@ -16,6 +18,14 @@ export default {
 </script>
 
 <style>
+@font-face {
+	font-family: 'Project Paintball';
+	src: url($font_path + 'Paintball_Beta_3.ttf');
+}
+@font-face {
+	font-family: 'ikmodoki';
+	src: url($font_path + 'ikamodoki1_0.ttf');
+}
 #app {
   font-family: 'Project Paintball', 'Project Paintball', "ikamodoki", sans-serif;
   -webkit-font-smoothing: antialiased;
