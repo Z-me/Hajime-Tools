@@ -5,9 +5,11 @@ import App from './App'
 import router from './router'
 import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.css'
+import VueVideoPlayer from 'vue-video-player'
 
 Vue.config.productionTip = false
 Vue.use(VueMaterial)
+Vue.use(VueVideoPlayer)
 
 /* eslint-disable no-new */
 new Vue({

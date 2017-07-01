@@ -1,20 +1,22 @@
 <template>
-  <div id="header">
+  <div class="header">
     <md-toolbar class="md-container">
       <md-button class="md-icon-button" @click.native="$refs.sidenav.toggle()">
         <md-icon>menu</md-icon>
       </md-button>
-      
+
       <h2 class="md-title" style="flex: 1">Hajime Tools</h2>
-      
+
       <button class="md-button" v-on:click="showLogin = true">LOGIN</button>
-      
+
       <router-link to="/" class="md-button">メモ</router-link>
       <router-link to="/health" class="md-button">ケンコー</router-link>
       <router-link to="/house" class="md-button">カケイボ</router-link>
       <router-link to="/kpt" class="md-button">KPT</router-link>
+      <router-link to="/video-player" class="md-button">Video</router-link>
+
     </md-toolbar>
-    
+
     <md-sidenav class="md-left" ref="sidenav">
       <md-toolbar class="md-account-header">
         <h1>一覧</h1>
@@ -46,7 +48,7 @@
         </md-list-item>
       </md-list>
     </md-sidenav>
-    
+
     <Modal v-if="showLogin" @close="showLogin = false">
       <h2 slot="header">Login</h2>
       <Login slot="body"></Login>

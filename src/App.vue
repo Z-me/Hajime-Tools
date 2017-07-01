@@ -19,15 +19,17 @@ export default {
 
 <style>
 @font-face {
-	font-family: 'Project Paintball';
+	font-family: 'Project Paintball' !important;
 	src: url($font_path + 'Paintball_Beta_3.ttf');
 }
 @font-face {
-	font-family: 'ikmodoki';
+	font-family: 'ikmodoki' !important;
 	src: url($font_path + 'ikamodoki1_0.ttf');
 }
 #app {
   font-family: 'Project Paintball', 'Project Paintball', "ikamodoki", sans-serif;
+  src: url($font_path + 'Paintball_Beta_3.ttf');
+  src: url($font_path + 'ikamodoki1_0.ttf');
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;

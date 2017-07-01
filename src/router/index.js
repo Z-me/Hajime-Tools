@@ -4,6 +4,7 @@ import Memo from '@/pages/Memo'
 import House from '@/pages/HouseholdAccountBook'
 import Health from '@/pages/Health'
 import KPT from '@/pages/KPT'
+import VideoPlayer from '@/pages/VideoPlayer'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/kpt',
       name: 'KPT',
       component: KPT
+    },
+    {
+      path: '/video-player',
+      name: 'VideoPlayer',
+      component: VideoPlayer
     }
   ]
 })

@@ -1,21 +1,22 @@
 <template>
-  <div class="HouseHold">
-    <h1>カケイボ</h1>
-    <VoiceInput></VoiceInput>
+  <div class="VideoPlayer">
+    <h1>ビデオプレーヤー</h1>
+    <Video></Video>
   </div>
 </template>
 
 <script>
-import VoiceInput from '@/components/Voice_input'
+import Video from '@/components/Video'
+
 export default {
-  name: 'HouseHold',
+  name: 'VideoPlayer',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'aaa'
     }
   },
   components: {
-    VoiceInput
+    Video
   }
 }
 </script>
