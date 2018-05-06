@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header></Header>
+    <appHeader></appHeader>
     <div class="main-content">
       <router-view></router-view>
     </div>
@@ -8,27 +8,18 @@
 </template>
 
 <script>
-import Header from '@/components/Header'
+import appHeader from '@/components/header'
 export default {
   name: 'app',
   components: {
-    Header
+    appHeader
   }
 }
 </script>
 
 <style>
-@font-face {
-  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
-  src: url($font_path +'Splatfont2.ttf') format('ttf');
-  font-style     : normal;
-  font-weight    : 400;
-  text-rendering : optimizeLegibility;
-}
 #app {
   font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
-  font-style     : normal;
-  font-weight    : 400;
   text-rendering : optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
