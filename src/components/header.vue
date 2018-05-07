@@ -51,9 +51,9 @@
 
     <Modal v-if="showLogin" @close="showLogin = false">
       <h2 slot="header">Login</h2>
-      <Login slot="body"></Login>
+      <Login slot="body" ref="logincom"></Login>
       <div slot="footer">
-        <md-button class="md-raised md-primary">Login</md-button>
+        <md-button class="md-raised md-primary" @click="reflogin">ログインn</md-button>
         <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
         <button class="md-button md-raised md-warn" v-on:click="showLogin = false">
           モドル
@@ -88,6 +88,12 @@ export default {
       document.getelementbyid('form-' + which).addClass('active')
       document.getelementbyid(which + '-form').addClass('active')
       Modal.active = which
+    },
+    reflogin: function () {
+      this.$refs.logincom.login()
+    },
+    reflogout: function () {
+      this.$refs.logincom.logout()
     }
   }
 }

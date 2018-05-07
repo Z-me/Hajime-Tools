@@ -1,20 +1,46 @@
 <template>
   <div id="login">
+    <p>{{message}}</p>
     <md-input-container>
-      <label>ユーザ メイ</label>
-      <md-input required></md-input>
+      <label>メールアドレス</label>
+      <md-input required v-model="mail"></md-input>
       <span class="md-error">Validation message</span>
     </md-input-container>
     <md-input-container md-has-password>
       <label>パスワード</label>
-      <md-input type="password"></md-input>
+      <md-input type="password" v-model="password"></md-input>
     </md-input-container>
   </div>
 </template>
 
 <script>
+import firebase from 'firebase'
 export default {
-  name: 'login'
+  name: 'login',
+  data: function () {
+    return {
+      mail: '',
+      password: '',
+      message: ''
+    }
+  },
+  methods: {
+    login () {
+      firebase.auth().signInWithEmailAndPassword(this.mail, this.password)
+    },
+    logout () {
+      firebase.auth().signOut()
+    }
+  },
+  created () {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.message = `${user.email}でログイン中だよ`
+      } else {
+        this.message = `ログインしてないよ`
+      }
+    })
+  }
 }
 </script>
 

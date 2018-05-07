@@ -63,8 +63,8 @@ export default {
 }
 
 .modal-container {
-  width: 50vw;
-  height: 30vw;
+  width: 60vw;
+  height: 40vw;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
