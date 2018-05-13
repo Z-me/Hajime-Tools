@@ -7,7 +7,8 @@
 
       <h2 class="md-title" style="flex: 1">Hajime Tools</h2>
 
-      <button class="md-button" v-on:click="showLogin = true">LOGIN</button>
+      <button class="md-button" v-if="!loginState" v-on:click="showLogin = true">ログイン</button>
+      <button class="md-button" v-else v-on:click="logout()">ログアウト</button>
 
       <router-link to="/" class="md-button">メモ</router-link>
       <router-link to="/health" class="md-button">ケンコー</router-link>
@@ -51,7 +52,7 @@
 
     <Modal v-if="showLogin" @close="showLogin = false">
       <h2 slot="header">Login</h2>
-      <Login slot="body" ref="logincom"></Login>
+      <Login slot="body" ref="logincom" @sendAlert="setAlert" msg=""></Login>
       <div slot="footer">
         <md-button class="md-raised md-primary" @click="reflogin">ログインn</md-button>
         <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
@@ -60,12 +61,19 @@
         </button>
       </div>
     </Modal>
+    <md-dialog-alert
+      :md-active.sync="activeAlert"
+      md-content="message"
+      md-confirm-text="閉じる" />
+    <md-button class="md-accent md-raised" @click="activeAlert = true">Alert</md-button>
+    {{activeAlert}}
   </div>
 </template>
 
 <script>
 import Modal from '@/components/Modal'
 import Login from '@/components/Login'
+import firebase from 'firebase'
 export default {
   name: 'header',
   components: {
@@ -74,11 +82,14 @@ export default {
   },
   data () {
     return {
-      showLogin: false
+      showLogin: false,
+      loginState: false,
+      message: '',
+      activeAlert: false
     }
   },
   methods: {
-    open: function (which, e) {
+    open (which, e) {
       e.preventDefault()
       if (Modal.active !== null) {
         document.getelementbyid('form-' + Modal.active).removeClass('active')
@@ -89,12 +100,32 @@ export default {
       document.getelementbyid(which + '-form').addClass('active')
       Modal.active = which
     },
-    reflogin: function () {
-      this.$refs.logincom.login()
+    setAlert (msg) {
+      this.message = msg
+      this.activeAlert = true
+      console.log('wored!!')
     },
-    reflogout: function () {
-      this.$refs.logincom.logout()
+    reflogin () {
+      this.$refs.logincom.login()
+      this.showLogin = false
+    },
+    logout () {
+      var alertFunc = this.setAlert
+      firebase.auth().signOut().then(function () {
+        alertFunc('ログアウトに成功しました')
+      }).catch(function (error) {
+        alertFunc('ログアウトに失敗しました。ERROR_CODE:' + error.code)
+      })
     }
+  },
+  created () {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.loginState = true
+      } else {
+        this.loginState = false
+      }
+    })
   }
 }
 </script>

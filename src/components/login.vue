@@ -26,10 +26,12 @@ export default {
   },
   methods: {
     login () {
-      firebase.auth().signInWithEmailAndPassword(this.mail, this.password)
-    },
-    logout () {
-      firebase.auth().signOut()
+      firebase.auth().signInWithEmailAndPassword(this.mail, this.password).then(function () {
+        this.$emit('sendAlert', 'ログインに成功しました')
+      }).catch(function (error) {
+        this.$emit('sendAlert', 'ログインに失敗しました')
+        console.log(error.code)
+      })
     }
   },
   created () {
