@@ -61,12 +61,14 @@
         </button>
       </div>
     </Modal>
-    <md-dialog-alert
-      :md-active.sync="activeAlert"
-      md-content="message"
-      md-confirm-text="閉じる" />
-    <md-button class="md-accent md-raised" @click="activeAlert = true">Alert</md-button>
-    {{activeAlert}}
+
+      <md-button class="md-primary md-raised" v-on:click="showSnackbar = true">動かない</md-button>
+      {{showSnackbar}}
+      <md-snackbar :md-position="position" :md-duration="Infinity" :md-active.sync="showSnackbar" md-persistent>
+        <span>こちらはテスト入力</span>
+        <md-button class="md-primary" @click="showSnackbar = false">Retry</md-button>
+      </md-snackbar>
+
   </div>
 </template>
 
@@ -80,14 +82,15 @@ export default {
     Modal,
     Login
   },
-  data () {
-    return {
-      showLogin: false,
-      loginState: false,
-      message: '',
-      activeAlert: false
-    }
-  },
+  data: () => ({
+    showLogin: false,
+    loginState: false,
+    message: 'test comment',
+    showSnackbar: false,
+    position: 'center',
+    duration: 4000,
+    isInfinity: false
+  }),
   methods: {
     open (which, e) {
       e.preventDefault()
