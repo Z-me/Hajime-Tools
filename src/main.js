@@ -9,12 +9,12 @@ import VueVideoPlayer from 'vue-video-player'
 import firebase from 'firebase'
 
 firebase.initializeApp({
-  apiKey: '****',
+  apiKey: 'AIzaSyDYGu8enSh6x7tnDJAVvj6QkBJNJu1ADs0',
   authDomain: 'hajime-tools.firebaseapp.com',
   databaseURL: 'https://hajime-tools.firebaseio.com',
   projectId: 'hajime-tools',
   storageBucket: 'hajime-tools.appspot.com',
-  messagingSenderId: '123456'
+  messagingSenderId: '861806036049'
 })
 
 Vue.config.productionTip = false
