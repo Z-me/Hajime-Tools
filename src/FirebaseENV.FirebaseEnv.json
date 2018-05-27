@@ -1,0 +1,8 @@
+{
+  "apiKey": "HOGEHGEHOGE",
+  "authDomain": "hajime-tools.firebaseapp.com",
+  "databaseURL": "https://hajime-tools.firebaseio.com",
+  "projectId": "hajime-tools",
+  "storageBucket": "hajime-tools.appspot.com",
+  "messagingSenderId": 100000000001
+}

@@ -13,12 +13,35 @@
             <span class="md-title"><h2 style="flex: 1">Hajime Tools</h2></span>
           </div>
 
-          <router-link to="/" class="md-button top-menu">メモ</router-link>
-          <router-link to="/health" class="md-button top-menu">ケンコー</router-link>
-          <router-link to="/house" class="md-button top-menu">カケイボ</router-link>
-          <router-link to="/kpt" class="md-button top-menu">KPT</router-link>
-          <router-link to="/video-player" class="md-button top-menu">Video</router-link>
+          <button class="md-button top-menu" v-if="!loginState" @click="showLoginModal">
+            <md-icon>assignment_ind</md-icon>
+            ログイン
+          </button>
+          <button class="md-button top-menu" v-else @click="logout()">
+            <md-icon>directions_run</md-icon>
+            ログアウト
+          </button>
 
+          <router-link to="/" class="md-button top-menu">
+            <md-icon>record_voice_over</md-icon>
+            メモ
+          </router-link>
+          <router-link to="/health" class="md-button top-menu">
+            <md-icon>directions_walk</md-icon>
+            ケンコー
+          </router-link>
+          <router-link to="/house" class="md-button top-menu">
+            <md-icon>attach_money</md-icon>
+            カケイボ
+          </router-link>
+          <router-link to="/kpt" class="md-button top-menu">
+            <md-icon>autorenew</md-icon>
+            KPT
+          </router-link>
+          <router-link to="/video-player" class="md-button top-menu">
+            <md-icon>local_movies</md-icon>
+            Video
+          </router-link>
         </div>
 
       </md-app-toolbar>
@@ -34,7 +57,7 @@
           </md-list-item>
 
           <md-list-item>
-            <md-icon>directions_run</md-icon>
+            <md-icon>directions_walk</md-icon>
             <router-link to="/health" class="md-list-item-text top-menu">ケンコー</router-link>
           </md-list-item>
 
@@ -60,26 +83,68 @@
         <router-view></router-view>
       </md-app-content>
     </md-app>
-
-<!--
-      <appHeader></appHeader>
-      <router-view></router-view>
+<!--    <Modal v-if="showLogin" @close="showLogin = false">
+      <h2 slot="header">Login</h2>
+    <Login slot="body" ref="logincom" @sendAlert="setAlert" msg=""></Login>
+      <div slot="footer">
+        <md-button class="md-raised md-primary" @click="reflogin">ログイン</md-button>
+        <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
+        <button class="md-button md-raised md-warn" v-on:click="showLogin = false">
+          モドル
+        </button>
+      </div>
+    </Modal>
 -->
+    <Modal ref='modal'>
+      <Login ref='auth' @close='closeModal' :login-state="loginState" :login-message="message"></Login>
+    </Modal>
 
     </div>
   </div>
 </template>
 
 <script>
-import appHeader from '@/components/header'
+import firebase from 'firebase'
+import Modal from '@/components/Modal'
+import Login from '@/components/login'
 export default {
   name: 'app',
   components: {
-    appHeader
+    Modal,
+    Login
   },
   data: () => ({
-    menuVisible: false
-  })
+    menuVisible: false,
+    showLogin: false,
+    loginState: false,
+    message: 'test comment'
+  }),
+  methods: {
+    showLoginModal () {
+      this.$refs.modal.modalControl(true)
+    },
+    closeModal (state) {
+      this.$refs.modal.modalControl(false)
+    },
+    logout () {
+      firebase.auth().signOut().then(function () {
+        console.log('logout success')
+      }).catch(function (error) {
+        console.log('logout false', error)
+      })
+    }
+  },
+  created () {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.message = `${user.email}でログイン中だよ`
+        this.loginState = true
+      } else {
+        this.message = `ログインしてないよ`
+        this.loginState = false
+      }
+    })
+  }
 }
 </script>
 
@@ -125,5 +190,9 @@ export default {
 }
 .viewing-contents {
   padding: 16px;
+}
+.md-dialog-container {
+  background: #FFFF !important;
+  padding: 1vh !important;
 }
 </style>
