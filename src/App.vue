@@ -83,21 +83,15 @@
         <router-view></router-view>
       </md-app-content>
     </md-app>
-<!--    <Modal v-if="showLogin" @close="showLogin = false">
-      <h2 slot="header">Login</h2>
-    <Login slot="body" ref="logincom" @sendAlert="setAlert" msg=""></Login>
-      <div slot="footer">
-        <md-button class="md-raised md-primary" @click="reflogin">ログイン</md-button>
-        <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
-        <button class="md-button md-raised md-warn" v-on:click="showLogin = false">
-          モドル
-        </button>
-      </div>
-    </Modal>
--->
+
     <Modal ref='modal'>
-      <Login ref='auth' @close='closeModal' :login-state="loginState" :login-message="message"></Login>
+      <Login ref='auth' @close='closeModal' @snack='setSnackbar' :login-state="loginState" :login-message="message"></Login>
     </Modal>
+
+    <md-snackbar md-position="center" md-duration="4000" :md-active.sync="showSnackbar" md-persistent>
+      <span>{{ snackbarMessage }}</span>
+      <md-button class="md-primary" @click="showSnackbar = false">閉じる</md-button>
+    </md-snackbar>
 
     </div>
   </div>
@@ -117,7 +111,11 @@ export default {
     menuVisible: false,
     showLogin: false,
     loginState: false,
-    message: 'test comment'
+    message: 'test comment',
+    showSnackbar: false,
+    position: 'center',
+    duration: 4000,
+    snackbarMessage: ''
   }),
   methods: {
     showLoginModal () {
@@ -132,6 +130,10 @@ export default {
       }).catch(function (error) {
         console.log('logout false', error)
       })
+    },
+    setSnackbar (msg) {
+      this.snackbarMessage = msg
+      this.showSnackbar = true
     }
   },
   created () {

@@ -18,22 +18,6 @@
       <md-button class="md-primary" @click="login">ログイン</md-button>
       <md-button class="md-primary" @click="colseModal">モドル</md-button>
     </md-dialog-actions>
-<!--    <div slot="body" class="md-layout">
-      <p class="md-size-100">{{message}}</p>
-      <div class="md-layout-item md-size-50 md-small-size-100">
-        <md-field :class="messageClass">
-          <label>メールアドレス</label>
-          <md-input v-model="mail" required></md-input>
-          <span class="md-error">ココ、忘れてるよ</span>
-        </md-field>
-      </div>
-      <div class="md-layout-item md-size-50 md-small-size-100">
-        <md-field>
-          <label>パスワード</label>
-          <md-input v-model="password" type="password"></md-input>
-        </md-field>
-      </div>
-    </div>-->
 
   </div>
 </template>
@@ -54,16 +38,28 @@ export default {
   ],
   methods: {
     login () {
-      firebase.auth().signInWithEmailAndPassword(this.mail, this.password).then(function () {
-        // this.$emit('sendAlert', 'ログインに成功しました')
-        this.colseModal()
+      this.setSnack(firebase.auth().signInWithEmailAndPassword(this.mail, this.password).then(function () {
+        // return this.setSnack('ログインに成功しました。')
+        return {'msg': 'ログインに成功しました。'}
       }).catch(function (error) {
-        // this.$emit('sendAlert', 'ログインに失敗しました')
-        console.log(error.code)
-      })
+        return {'msg': 'ログインに失敗しました。ERROR_CODE: ' + error.code}
+      }))
+      this.colseModal()
     },
     colseModal () {
       this.$emit('close', false)
+    },
+    setSnack (msg) {
+      for (let key in msg) {
+        console.log(key, msg[key])
+        if (msg[key] instanceof Object && 'msg' in msg[key]) {
+          console.log(msg[key].msg)
+          return this.$emit('snack', msg[key].msg)
+        }
+      }
+      console.log(msg)
+      // console.log(result)
+      // this.$emit('snack', result)
     }
   }
 }
