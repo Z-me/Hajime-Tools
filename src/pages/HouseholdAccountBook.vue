@@ -16,24 +16,24 @@ export default {
   data: () => ({
     fireDB: '',
     costDB: '',
-    costData: []
+    costData: {}
   }),
   components: {
     VoiceInput
   },
   methods: {
     syncFirebase () {
-      this.costDB = this.fireDB.database().ref('costs')
-      let list = []
+      let listObj = []
       this.costDB.on('value', function (fbdata) {
         console.log('fvdata', fbdata.val())
-        list.push(fbdata.val())
+        listObj.push(fbdata.val())
       })
-      this.costData = list
+      this.costData = listObj
     }
   },
   created () {
     this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
+    this.costDB = this.fireDB.database().ref('costs')
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.syncFirebase()
