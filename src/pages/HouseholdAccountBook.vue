@@ -2,7 +2,6 @@
   <div class="HouseHold">
     <h1>カケイボ</h1>
     <VoiceInput></VoiceInput>
-    <pre>{{ costData }}</pre>
   </div>
 </template>
 
@@ -24,7 +23,7 @@ export default {
   methods: {
     syncFirebase () {
       let listObj = []
-      this.costDB.on('value', function (fbdata) {
+      this.costDB.on('child_added', function (fbdata) {
         console.log('fvdata', fbdata.val())
         listObj.push(fbdata.val())
       })

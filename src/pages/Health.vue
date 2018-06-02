@@ -1,73 +1,82 @@
 <template>
   <div class="Health">
     <h1>タイジューケー</h1>
-    <VoiceInput></VoiceInput>
-    <form novalidate @submit.stop.prevent="submit">
-      <md-input-container>
-        <label>ニュウリョク</label>
-        <md-textarea v-model="pushData"></md-textarea>
-      </md-input-container>
-    </form>
-    {{pushData}}
-    <md-button class="md-raised md-primary" v-on:click.native="pushData">トーロク</md-button>
+    <md-field>
+      <label>ニュウリョク</label>
+      <md-input v-model="weight" type="number" min='0'></md-input>
+    </md-field>
+    <md-button class="md-raised md-primary" @click="pushData()">トーロク</md-button>
     <vue-chart type="line" :data="chartData"></vue-chart>
-    <Video></Video>
   </div>
 </template>
 
 <script>
-import VoiceInput from '@/components/Voice_input'
-import Firebase from 'firebase'
-import Video from '@/components/Video'
+import firebase from 'firebase'
+import firebaseConf from '../.firebaseEnv.json'
 import VueChart from 'vue-chart-js'
 export default {
   name: 'Health',
-  data () {
-    return {
-      chartData: {
-        labels: ['Item 1', 'Item 2', 'Item 3'],
-        datasets: [
-          {
-            label: 'Component 1',
-            data: [10, 20, 30]
-          },
-          {
-            label: 'Component 2',
-            data: [20, 30, 40]
-          }
-        ]
-      },
-      weightDB: {},
-      Date: '',
-      pushData: '1234'
-    }
-  },
+  data: () => ({
+    chartData: {
+      labels: ['Item 1', 'Item 2', 'Item 3'],
+      datasets: [
+        {
+          label: 'Component 1',
+          data: [15, 20, 30]
+        },
+        {
+          label: 'Component 2',
+          data: [20, 30, 40]
+        }
+      ]
+    },
+    fireDB: '',
+    weightDB: {},
+    weightData: {},
+    today: '',
+    weight: '',
+    hoge: ''
+  }),
   components: {
-    VoiceInput,
-    Video,
     VueChart
   },
   methods: {
-    pushData: function (event) {
-      alert('aaaaaa')
-//      let DB = new Firebase('https://hajime-tools.firebaseio.com')
-//      let weightDB = DB.child('weight')
-      this.pushdata.id = this.Date
-      this.weightDB.push(this.pushData)
+    pushData (event) {
+      let weightObj = {
+        date: this.today,
+        weight: Number(this.weight)
+      }
+      this.hoge = weightObj
+      this.weightDB.push(weightObj)
+    },
+    syncFirebase () {
+      let listObj = []
+      this.weightDB.on('child_added', function (fbdata) {
+        console.log('fvdata', fbdata.val())
+        listObj.push(fbdata.val())
+      })
+      this.weightData = listObj
+    },
+    setDate (now) {
+      let month = (now.getMonth() + 1 > 9 ? '' : '0') + (now.getMonth() + 1)
+      let date = (now.getDate() > 9 ? '' : '0') + now.getDate()
+      this.today = now.getFullYear() + '-' + month + '-' + date
     }
   },
-  mounted () {
-    this.$nextTick(function () {
-      let DB = new Firebase('https://hajime-tools.firebaseio.com')
-      this.weightDB = DB.child('weight')
-      this.Date = new Date()
-      this.weightDB.on('child_added', (datas) => {
-        let data = datas.val()
-        data.id = datas.key()
-        this.items.unshift(data)
-        console.log(data)
-      })
+  created () {
+    // set Firebase env
+    this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
+    this.weightDB = this.fireDB.database().ref('weights')
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.syncFirebase()
+      } else {
+        alert('ログインしてね♪')
+      }
     })
+    // set date
+    let now = new Date()
+    this.setDate(now)
   }
 }
 </script>
