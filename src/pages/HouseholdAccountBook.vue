@@ -1,11 +1,12 @@
 <template>
   <div class="HouseHold">
-    <h1>カケイボ</h1>
+    <houseTable :items='costData'></houseTable>
     <VoiceInput></VoiceInput>
   </div>
 </template>
 
 <script>
+import houseTable from '@/components/table'
 import VoiceInput from '@/components/Voice_input'
 import firebase from 'firebase'
 import firebaseConf from '../.firebaseEnv.json'
@@ -18,7 +19,8 @@ export default {
     costData: {}
   }),
   components: {
-    VoiceInput
+    VoiceInput,
+    houseTable
   },
   methods: {
     syncFirebase () {
@@ -31,6 +33,7 @@ export default {
     }
   },
   created () {
+    const that = this
     this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
     this.costDB = this.fireDB.database().ref('costs')
     firebase.auth().onAuthStateChanged(user => {
@@ -38,6 +41,7 @@ export default {
         this.syncFirebase()
       } else {
         alert('ログインしてね♪')
+        that.$router.push('/')
       }
     })
   }

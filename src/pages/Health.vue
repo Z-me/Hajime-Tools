@@ -65,6 +65,7 @@ export default {
   },
   created () {
     // set Firebase env
+    const that = this
     this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
     this.weightDB = this.fireDB.database().ref('weights')
     firebase.auth().onAuthStateChanged(user => {
@@ -72,6 +73,7 @@ export default {
         this.syncFirebase()
       } else {
         alert('ログインしてね♪')
+        that.$router.push('/')
       }
     })
     // set date
