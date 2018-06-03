@@ -15,12 +15,10 @@
         <slot name="footer"></slot>
       </footer>
       <md-dialog-actions>
-        <md-button class="md-primary" @click="showModal = false">Close</md-button>
-        <md-button class="md-primary" @click="showModal = false">{{message}}</md-button>
+        <md-button class="md-raised md-primary" @click="showModal = false">Close</md-button>
+        <md-button class="md-raised" @click="showModal = false">{{message}}</md-button>
       </md-dialog-actions>
     </md-dialog>
-
-
   </div>
 </template>
 

@@ -160,6 +160,12 @@ export default {
   height: 100vh !important;
   margin: 0px;
 }
+input {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 .md-app {
   border: 1px solid rgba(#000, .12);
   height: 100vh !important;
@@ -196,5 +202,43 @@ export default {
 .md-dialog-container {
   background: #FFFF !important;
   padding: 1vh !important;
+}
+.md-datepicker-header {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #FFF;
+  background: #30A8F8;
+}
+.md-datepicker-body {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #FFF;
+}
+.md-datepicker-selected {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  flex-flow: column;
+  vertical-align: top;
+  color: #30A8F8;
+  border: 4px solid #30A8F8;
+}
+.md-list {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #FFF;
+}
+.md-field {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>

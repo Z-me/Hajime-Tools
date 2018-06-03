@@ -7,14 +7,17 @@
         </div>
 
         <md-field md-clearable class="md-toolbar-section-end">
+          <body>
+            <slot name="body"></slot>
+          </body>
           <md-input placeholder="支払い者検索" v-model="search" @input="searchOnTable" class="find"/>
         </md-field>
       </md-table-toolbar>
 
       <md-table-empty-state
         md-label="検索結果ぜろー"
-        :md-description="`'${search}' っていう検索条件に当てはまるデータはないっすね`">
-        <md-button class="md-primary md-raised" @click="newUser">Create New User</md-button>
+        :md-description="`'${search}' っていう検索条件に当てはまるデータはないっすねぇ`">
+        <md-button class="md-primary md-raised" @click="newInput">情報追加</md-button>
       </md-table-empty-state>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
@@ -98,8 +101,8 @@
       'items'
     ],
     methods: {
-      newUser () {
-        window.alert('Noop')
+      newInput () {
+        this.$emit('showInputModal')
       },
       searchOnTable () {
         this.searched = searchByPayment(this.items, this.search)
