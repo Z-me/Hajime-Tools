@@ -51,29 +51,38 @@
 
         <md-list>
           <md-list-item>
-            <md-icon>record_voice_over</md-icon>
-            <!-- <span class="md-list-item-text">Inbox</span> -->
-            <router-link to="/" class="md-list-item-text top-menu">メモ</router-link>
+            <router-link to="/" class="md-button top-menu">
+              <md-icon>record_voice_over</md-icon>
+              メモ
+            </router-link>
           </md-list-item>
 
           <md-list-item>
-            <md-icon>directions_walk</md-icon>
-            <router-link to="/health" class="md-list-item-text top-menu">ケンコー</router-link>
+            <router-link to="/health" class="md-button top-menu">
+              <md-icon>directions_walk</md-icon>
+              ケンコー
+            </router-link>
           </md-list-item>
 
           <md-list-item>
-            <md-icon>attach_money</md-icon>
-            <router-link to="/house" class="md-list-item-text top-menu">カケイボ</router-link>
+            <router-link to="/house" class="md-button top-menu">
+              <md-icon>attach_money</md-icon>
+              カケイボ
+            </router-link>
           </md-list-item>
 
           <md-list-item>
-            <md-icon>autorenew</md-icon>
-            <router-link to="/kpt" class="md-list-item-text top-menu">KPT</router-link>
+            <router-link to="/kpt" class="md-button top-menu">
+              <md-icon>autorenew</md-icon>
+              KPT
+            </router-link>
           </md-list-item>
 
           <md-list-item>
-            <md-icon>local_movies</md-icon>
-            <router-link to="/video-player" class="md-list-item-text top-menu">Video</router-link>
+            <router-link to="/video-player" class="md-button top-menu">
+              <md-icon>local_movies</md-icon>
+              Video
+            </router-link>
           </md-list-item>
 
         </md-list>
@@ -233,7 +242,6 @@ input {
   text-rendering : optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #FFF;
 }
 .md-field {
   font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
