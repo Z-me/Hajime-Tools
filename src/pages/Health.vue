@@ -22,10 +22,12 @@ export default {
       datasets: [
         {
           label: 'Component 1',
+          backgroundColor: 'rgb(114, 213, 207)',
           data: [15, 20, 30]
         },
         {
           label: 'Component 2',
+          backgroundColor: 'rgb(238, 86, 86)',
           data: [20, 30, 40]
         }
       ]
