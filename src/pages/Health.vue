@@ -54,7 +54,6 @@ export default {
     syncFirebase () {
       let listObj = []
       this.weightDB.on('child_added', function (fbdata) {
-        console.log('fvdata', fbdata.val())
         listObj.push(fbdata.val())
       })
       this.weightData = listObj

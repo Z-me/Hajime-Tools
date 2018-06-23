@@ -48,7 +48,7 @@
       </div>
       <div class="md-layout-item md-medium-size-50 md-small-size-50 md-xsmall-size-100">
         <p>支払い者割合</p>
-        <holizontal-bar :width="210" :height="70" :chart-data="chartData"></holizontal-bar>
+        <holizontal-bar :width="210" :height="70" :chart-data="paymentRate"></holizontal-bar>
       </div>
 
       <div class="md-layout-item md-medium-size-100 md-small-size-100 md-xsmall-size-100">
@@ -111,7 +111,8 @@ export default {
     dayObj: {},
     selectedDay: 'All Data in List',
     chartData: null,
-    allGenreDonuts: null
+    allGenreDonuts: null,
+    paymentRate: null
   }),
   props: [
     'items'
@@ -186,14 +187,13 @@ export default {
         ]
       }
       this.setAllGenreDonuts()
+      this.setPaymentRate()
     },
     setAllGenreDonuts () {
       let labels = []
       let datas = {}
-      let data = this.searched
+      let data = Object.assign({}, this.searched)
       for (let key in data) {
-        console.log('key', key)
-        console.log('data', data[key])
         if (labels.indexOf(String(data[key].type)) < 0) {
           labels.push(data[key].type)
           datas[data[key].type] = Number(data[key].cost)
@@ -213,18 +213,49 @@ export default {
           data: data
         }]
       }
-      console.log(this.allGenreDonuts)
+      console.log('allGenre', this.allGenreDonuts)
+      return datas
+    },
+    setPaymentRate () {
+      let data = Object.assign({}, this.searched)
+      let labels = []
+      let datas = {}
+      for (let key in data) {
+        if (labels.indexOf(String(data[key].payment)) < 0) {
+          labels.push(data[key].payment)
+          datas[data[key].payment] = Number(data[key].cost)
+        } else {
+          datas[data[key].payment] += Number(data[key].cost)
+        }
+      }
+      let result = Object.values(datas)
+      this.paymentRate = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Payment Rate',
+            backgroundColor: colorList,
+            data: result
+          }
+        ]
+      }
+
+      console.log('paymentRate', this.paymentRate)
       return datas
     }
   },
   created () {
     this.searched = this.items
-    this.setDayObj
+    this.setDayObj()
+    this.fillData()
   },
   watch: {
     items: function () {
       this.searched = this.items
       this.setDayObj()
+    },
+    searched: function () {
+      this.fillData()
     }
   }
 }
