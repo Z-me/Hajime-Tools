@@ -249,4 +249,11 @@ input {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.md-menu-content-container {
+  background: #FFF;
+  color: #30A8F8;
+}
+select[name=dateSelect]::placeholder {
+  color: #FFF !important;
+}
 </style>
