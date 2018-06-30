@@ -56,12 +56,19 @@
         <h3 class="center">支出日グラフ</h3>
         <line-chart :width="420" :height="70" :chart-data="dailyCosts"></line-chart>
       </div>
-      <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
-        <h3 class="center">支出者別支払割合(Hajime)</h3>
+      <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
+        <h1 class="center">Hajime</h1>
+        <h3 class="center">支出者別支払割合</h3>
         <doughnut-chart :width="210" :height="100" :chart-data="getPaymentCosts('Hajime')"></doughnut-chart>
         <h1 class="center">¥ {{totalCosts.Hajime}}</h1>
       </div>
-      <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
+      <div class="md-layout-item md-xlarge-size-10 md-large-size-10 md-medium-size-10 md-small-size-10 md-xsmall-size-100">
+        <img src="../assets/h2s.png" v-if="shareCosts < 0">
+        <h2 class="center">¥ {{Math.abs(shareCosts)}}</h2>
+        <img src="../assets/s2h.png" v-if="shareCosts > 0">
+      </div>
+      <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
+        <h1 class="center">Shiori</h1>
         <h3 class="center">支出者別支払割合(Shiori)</h3>
         <doughnut-chart :width="210" :height="100" :chart-data="getPaymentCosts('Shiori')"></doughnut-chart>
         <h1 class="center">¥ {{totalCosts.Shiori}}</h1>
@@ -116,7 +123,8 @@ export default {
     paymentRate: null,
     dailyCosts: null,
     totalCost: 0,
-    totalCosts: {}
+    totalCosts: {},
+    shareCosts: 0
   }),
   props: [
     'items'
@@ -238,6 +246,18 @@ export default {
       return year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day)
     },
     createCalcResult () {
+      let data = Object.assign({}, this.searched)
+      let costs = {
+        Hajime: 0,
+        Shiori: 0
+      }
+      for (let key in data) {
+        costs[data[key].payment] += Math.round(Number(data[key].cost) / 2)
+        if (data[key].type === 'rent') {
+          costs[data[key].payment] -= 30000
+        }
+      }
+      this.shareCosts = costs.Hajime - costs.Shiori
       return null
     },
     fillData () {
@@ -259,6 +279,7 @@ export default {
       this.setAllGenreDonuts()
       this.setPaymentRate()
       this.setDailyCosts()
+      this.createCalcResult()
     },
     setAllGenreDonuts () {
       let labels = []
