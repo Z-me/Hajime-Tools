@@ -1,6 +1,6 @@
 <template>
   <div class="memo">
-    <h1>momomommo</h1>
+    <h1>音声入力メモ</h1>
     <VoiceInput></VoiceInput>
   </div>
 </template>

@@ -1,21 +1,159 @@
 <template>
   <div class="HouseHold">
-    <h1>カケイボ</h1>
+    <houseTable :items='costData' @showInputModal='showModal'>
+      <md-button slot="body" class="md-primary newInput" @click="showModal">新規追加</md-button>
+    </houseTable>
+    <Modal ref='modal'>
+      <div class="md-title" slot="header">新規追加</div>
+
+      <div class="md-layout md-gutter" slot="body">
+        <div class="md-layout-item md-small-size-100">
+          <md-field>
+            <md-table md-card class="input-table">
+
+              <md-table-toolbar class="imput-table">
+                <h1 class="md-title">入力情報</h1>
+              </md-table-toolbar>
+
+              <md-table-row>
+                <md-table-head>日付</md-table-head>
+                <md-table-head>種別</md-table-head>
+                <md-table-head>価格</md-table-head>
+                <md-table-head>支払い者</md-table-head>
+              </md-table-row>
+
+              <md-table-row v-for="item in newDatas" :key="item.id">
+                <md-table-cell>
+                  <md-datepicker v-model="item.date" :md-open-on-focus="false"/>
+                </md-table-cell>
+
+                <md-table-cell>
+                  <md-select v-model="item.type" name="type" id="type">
+                    <template v-for="type in types">
+                      <md-option :value="type">{{type}}</md-option>
+                    </template>
+                  </md-select>
+                </md-table-cell>
+
+                <md-table-cell>
+                  <md-input v-model="item.cost" type="number" min='0'></md-input>
+                </md-table-cell>
+
+                <md-table-cell>
+                  <md-select v-model="item.payment" name="payment" id="payment">
+                    <template v-for="payment in payments">
+                      <md-option :value="payment">{{payment}}</md-option>
+                    </template>
+                  </md-select>
+                </md-table-cell>
+              </md-table-row>
+
+            </md-table>
+          </md-field>
+        </div>
+        <md-button class="md-icon-button md-primary" @click="pushNewData"><md-icon>add_circle</md-icon></md-button>
+        <md-button class="md-icon-button md-accent" @click="popNewData"><md-icon>remove_circle</md-icon></md-button>
+        <md-button class="md-raised md-primary" @click="saveData">トーロク</md-button>
+        <md-button class="md-raised" @click="closeModal">モドル</md-button>
+      </div>
+
+    </Modal>
     <VoiceInput></VoiceInput>
   </div>
 </template>
 
 <script>
+import houseTable from '@/components/table'
+import Modal from '@/components/Modal'
 import VoiceInput from '@/components/Voice_input'
+import firebase from 'firebase'
+import firebaseConf from '../.firebaseEnv.json'
+
 export default {
   name: 'HouseHold',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+  data: () => ({
+    fireDB: '',
+    costDB: '',
+    costData: {},
+    newDatas: [],
+    today: '',
+    payments: [
+      'Hajime',
+      'Shiori'
+    ],
+    types: [
+      'foods',
+      'utility',
+      'Sundries',
+      'rent'
+    ]
+  }),
+  components: {
+    VoiceInput,
+    houseTable,
+    Modal
+  },
+  methods: {
+    syncFirebase () {
+      let listObj = []
+      this.costDB.on('child_added', function (fbdata) {
+        listObj.push(fbdata.val())
+      })
+      this.costData = listObj
+    },
+    setDate (d) {
+      let month = (d.getMonth() + 1 > 9 ? '' : '0') + (d.getMonth() + 1)
+      let date = (d.getDate() > 9 ? '' : '0') + d.getDate()
+      return d.getFullYear() + '-' + month + '-' + date
+    },
+    showModal () {
+      this.$refs.modal.modalControl(true)
+    },
+    closeModal () {
+      this.$refs.modal.modalControl(false)
+    },
+    pushNewData () {
+      this.newDatas.push({
+        date: this.today,
+        cost: 0,
+        payment: '',
+        type: 'foods'
+      })
+    },
+    popNewData () {
+      this.newDatas.pop()
+    },
+    saveData () {
+      let dataset = this.newDatas
+      for (var key in dataset) {
+        let tmpDate = new Date(Date.parse(dataset[key].date))
+        dataset[key].date = this.setDate(tmpDate)
+        this.costDB.push(dataset[key])
+      }
+      this.closeModal()
     }
   },
-  components: {
-    VoiceInput
+  created () {
+    const that = this
+    let now = new Date()
+    this.today = this.setDate(now)
+    this.newDatas.push({
+      date: this.today,
+      cost: 0,
+      payment: '',
+      type: 'foods'
+    })
+
+    this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
+    this.costDB = this.fireDB.database().ref('costs')
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.syncFirebase()
+      } else {
+        alert('ログインしてね♪')
+        that.$router.push('/')
+      }
+    })
   }
 }
 </script>
@@ -38,5 +176,21 @@ li {
 
 a {
   color: #42b983;
+}
+
+.newInput {
+  font-family: 'Splatfont2', 'Splatfont2', "Splatfont2", sans-serif !important;
+  text-rendering : optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #FFF;
+}
+
+.md-toolbar {
+  max-width: 80VW !important;
+}
+
+.md-table {
+  max-height: 60Vh
 }
 </style>

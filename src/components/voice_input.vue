@@ -2,10 +2,10 @@
   <div id="voice_input">
     <div>
       <form novalidate @submit.stop.prevent="submit">
-        <md-input-container>
+        <md-field>
           <label>ニュウリョク</label>
-          <md-textarea v-model="input"></md-textarea> {{recognitionText}}
-        </md-input-container>
+          <md-input v-model="input"></md-input> {{recognitionText}}
+        </md-field>
       </form>
       <h2>Input sentence is " {{input}} "</h2>
     </div>
