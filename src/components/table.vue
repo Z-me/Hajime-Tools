@@ -9,7 +9,6 @@
             <slot name="body"></slot>
           </body>
           <md-button @click="resetList" class="table-header-button">検索クリアー</md-button>
-          <md-button @click="createCalcResult" class="table-header-button">計算開始</md-button>
         </div>
 
         <md-field md-clearable class="md-toolbar-section-end">
@@ -30,9 +29,17 @@
 
       <md-table-empty-state
         md-label="検索結果ぜろー"
-        :md-description="`'${search}' っていう検索条件に当てはまるデータはないっすねぇ`">
+        :md-description="`'${search}' っていう検索条件に当てはまるデータはないっすねぇ`"
+        v-if="search != null ">
         <md-button class="md-primary md-raised" @click="newInput">情報追加</md-button>
       </md-table-empty-state>
+      <md-table-empty-state
+        md-label="NOW LOADING"
+        class="bgblack"
+        v-else>
+        <img src="../assets/loading.gif">
+      </md-table-empty-state>
+
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
         <md-table-cell md-label="日付" md-sort-by="date">{{ item.date }}</md-table-cell>
@@ -41,39 +48,7 @@
         <md-table-cell md-label="支払い者" md-sort-by="payment">{{ item.payment }}</md-table-cell>
       </md-table-row>
     </md-table>
-    <div class="md-layout md-gutter md-alignment-center result-field" v-if="chartData != null">
-      <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
-        <h3 class="center">全体支払割合</h3>
-        <doughnut-chart :width="210" :height="70" :chart-data="allGenreDonuts"></doughnut-chart>
-        <h1 class="center">¥ {{totalCost}}</h1>
-      </div>
-      <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
-        <h3 class="center">支払い者割合</h3>
-        <holizontal-bar :width="210" :height="70" :chart-data="paymentRate"></holizontal-bar>
-      </div>
-
-      <div class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
-        <h3 class="center">支出日グラフ</h3>
-        <line-chart :width="420" :height="70" :chart-data="dailyCosts"></line-chart>
-      </div>
-      <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
-        <h1 class="center">Hajime</h1>
-        <h3 class="center">支出者別支払割合</h3>
-        <doughnut-chart :width="210" :height="100" :chart-data="getPaymentCosts('Hajime')"></doughnut-chart>
-        <h1 class="center">¥ {{totalCosts.Hajime}}</h1>
-      </div>
-      <div class="md-layout-item md-xlarge-size-10 md-large-size-10 md-medium-size-10 md-small-size-10 md-xsmall-size-100">
-        <img src="../assets/h2s.png" v-if="shareCosts < 0">
-        <h2 class="center">¥ {{Math.abs(shareCosts)}}</h2>
-        <img src="../assets/s2h.png" v-if="shareCosts > 0">
-      </div>
-      <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
-        <h1 class="center">Shiori</h1>
-        <h3 class="center">支出者別支払割合(Shiori)</h3>
-        <doughnut-chart :width="210" :height="100" :chart-data="getPaymentCosts('Shiori')"></doughnut-chart>
-        <h1 class="center">¥ {{totalCosts.Shiori}}</h1>
-      </div>
-    </div>
+    <Chart :data='searched'></Chart>
   </div>
 </template>
 
@@ -106,10 +81,7 @@ const colorList = [
   'rgba(47, 105, 65, 0.5)'
 ]
 
-import DoughnutChart from '../lib/doughnutChart.js'
-import LineChart from '../lib/lineChart.js'
-import HolizontalBar from '../lib/holizontalBarChart.js'
-import PieChart from '../lib/polarChart.js'
+import Chart from '../components/homebookChart'
 
 export default {
   name: 'TableSearch',
@@ -130,10 +102,7 @@ export default {
     'items'
   ],
   components: {
-    DoughnutChart,
-    LineChart,
-    HolizontalBar,
-    PieChart
+    Chart
   },
   methods: {
     newInput () {
@@ -261,21 +230,6 @@ export default {
       return null
     },
     fillData () {
-      this.chartData = {
-        labels: ['item1', 'item2'],
-        datasets: [
-          {
-            label: 'Data One',
-            backgroundColor: colorList[0],
-            data: [11, 14]
-          },
-          {
-            label: 'Data Two',
-            backgroundColor: colorList[1],
-            data: [3, 20]
-          }
-        ]
-      }
       this.setAllGenreDonuts()
       this.setPaymentRate()
       this.setDailyCosts()
@@ -465,5 +419,8 @@ export default {
 }
 .center {
   text-align: center !important;
+}
+.bgblack {
+  background-color: #15191f !important;
 }
 </style>
