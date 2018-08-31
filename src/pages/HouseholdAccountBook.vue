@@ -58,7 +58,6 @@
       </div>
 
     </Modal>
-    <VoiceInput></VoiceInput>
   </div>
 </template>
 
