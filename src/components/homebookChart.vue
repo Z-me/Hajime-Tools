@@ -149,7 +149,7 @@ export default {
       for (let dkey in datas) {
         data.push(datas[dkey])
       }
-      console.log('allGenre', this.allGenreDonuts)
+      // console.log('allGenre', this.allGenreDonuts)
       this.totalCost = costs
       this.allGenreDonuts = {
         labels: labels,
@@ -174,7 +174,7 @@ export default {
         }
       }
       let result = Object.values(datas)
-      console.log('paymentRate', this.paymentRate)
+      // console.log('paymentRate', this.paymentRate)
       this.paymentRate = {
         labels: labels,
         datasets: [
@@ -245,7 +245,7 @@ export default {
         datasets: datasets
       }
 
-      console.log('dailyCosts', this.dailyCosts)
+      // console.log('dailyCosts', this.dailyCosts)
       return datasets
     },
     setPaymentCosts (payment) {
@@ -264,8 +264,8 @@ export default {
           }
         }
       }
-      console.log('tyeps:_', types)
-      console.log('datas:_', datas)
+      // console.log('tyeps:_', types)
+      // console.log('datas:_', datas)
       let result = {
         labels: types,
         datasets: [

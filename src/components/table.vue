@@ -258,7 +258,7 @@ export default {
           data: data
         }]
       }
-      console.log('allGenre', this.allGenreDonuts)
+      // console.log('allGenre', this.allGenreDonuts)
       this.totalCost = costs
       return datas
     },
@@ -286,7 +286,7 @@ export default {
         ]
       }
 
-      console.log('paymentRate', this.paymentRate)
+      // console.log('paymentRate', this.paymentRate)
       return datas
     },
     setDailyCosts () {
@@ -347,7 +347,7 @@ export default {
         datasets: datasets
       }
 
-      console.log('dailyCosts', this.dailyCosts)
+      // console.log('dailyCosts', this.dailyCosts)
       return datasets
     },
     getPaymentCosts (payment) {
@@ -385,7 +385,7 @@ export default {
     }),
     onSelect (item) {
       // this.selected = item
-      console.log(item)
+      // console.log(item)
       this.$emit('showEditModal', item)
     }
   },
