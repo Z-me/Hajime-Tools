@@ -1,6 +1,6 @@
 <template>
   <div>
-    <md-table v-model="searched" md-sort="name" md-sort-order="asc" md-fixed-header @md-selected="onSelect">
+    <md-table v-model="searched" md-sort="date" md-sort-order="asc" md-fixed-header @md-selected="onSelect">
       <md-table-toolbar>
         <div class="md-toolbar-section-start">
           <h1 class="md-title">家計簿リスト</h1>
@@ -11,9 +11,9 @@
         </div>
         <md-field md-clearable class="md-toolbar-section-end">
           <md-select v-model="selectedDay" @input="searchOnTableDte" name="dateSelect" id="dateSelect" class="date-input-fealds" placeholder="日時指定">
-            <template v-for="(year, index) in dayObj">
-              <md-optgroup :label="index">
-                <template v-for="date in year">
+            <template v-for="(year, index) in Object.keys(dayObj).reverse()">
+              <md-optgroup :label="year">
+                <template v-for="date in objectSort(dayObj[year], false)">
                   <md-option :value="date.value">{{date.date}}</md-option>
                 </template>
               </md-optgroup>
@@ -142,7 +142,15 @@ export default {
           }]
         }
       }
-      this.dayObj = obj
+      // console.log(obj)
+      obj = this.objectSort(obj, true)
+      let resultDateObj = {}
+      Object.keys(obj).forEach(key => {
+        resultDateObj[key] = obj[key].sort((a, b) => {
+          return Number(a.date) < Number(b.date) ? 1 : -1
+        })
+      })
+      this.dayObj = resultDateObj
     },
     sortFunc (arr) {
       arr.sort(function (a, b) {
@@ -261,6 +269,20 @@ export default {
       // console.log('allGenre', this.allGenreDonuts)
       this.totalCost = costs
       return datas
+    },
+    objectSort (object, abs = true) {
+      var result = {}
+      var array = []
+      for (let key in object) {
+        if (object.hasOwnProperty(key)) {
+          array.push(Number(key))
+        }
+      }
+      abs ? array.sort() : array.reverse()
+      for (let i = 0; i < array.length; i++) {
+        result[array[i]] = object[array[i]]
+      }
+      return result
     },
     setPaymentRate () {
       let data = Object.assign({}, this.searched)

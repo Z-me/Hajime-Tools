@@ -122,6 +122,7 @@ export default {
     costDB: '',
     costData: {},
     newDatas: [],
+    userEmail: '',
     editData: {},
     today: '',
     payments: [
@@ -139,6 +140,12 @@ export default {
     VoiceInput,
     houseTable,
     Modal
+  },
+  computed: {
+    userName () {
+      if (!this.userEmail) return ''
+      return this.userEmail.indexOf('3110') > 0 ? 'Hajime' : 'Shiori'
+    }
   },
   methods: {
     syncFirebase () {
@@ -164,6 +171,7 @@ export default {
     },
     closeModal () {
       this.$refs.modal.modalControl(false)
+      this.newDatas = {}
     },
     closeEditModal () {
       this.$refs.editModal.modalControl(false)
@@ -172,7 +180,7 @@ export default {
       this.newDatas.push({
         date: this.today,
         cost: 0,
-        payment: '',
+        payment: this.userName,
         type: 'foods'
       })
     },
@@ -198,24 +206,28 @@ export default {
       this.costDB.child(this.editData.fbKey).update(result)
       this.closeEditModal()
       location.reload()
+    },
+    initializeData (name = '') {
+      this.newDatas.push({
+        date: this.today,
+        cost: 0,
+        payment: name.indexOf('3110') > 0 ? 'Hajime' : 'Shiori',
+        type: 'foods'
+      })
     }
   },
   created () {
     const that = this
     let now = new Date()
     this.today = this.setDate(now)
-    this.newDatas.push({
-      date: this.today,
-      cost: 0,
-      payment: '',
-      type: 'foods'
-    })
 
     this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
     this.costDB = this.fireDB.database().ref('costs')
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.syncFirebase()
+        this.userEmail = String(user.email)
+        this.initializeData(user.email)
       } else {
         alert('ログインしてね♪')
         that.$router.push('/')
