@@ -51,13 +51,13 @@ export default {
     },
     setSnack (msg) {
       for (let key in msg) {
-        console.log(key, msg[key])
+        // console.log(key, msg[key])
         if (msg[key] instanceof Object && 'msg' in msg[key]) {
-          console.log(msg[key].msg)
+          // console.log(msg[key].msg)
           return this.$emit('snack', msg[key].msg)
         }
       }
-      console.log(msg)
+      // console.log(msg)
       // console.log(result)
       // this.$emit('snack', result)
     }

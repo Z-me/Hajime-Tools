@@ -1,31 +1,34 @@
 <template>
   <div>
-    <md-table v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
+    <md-table v-model="searched" md-sort="date" md-sort-order="asc" md-fixed-header @md-selected="onSelect">
       <md-table-toolbar>
         <div class="md-toolbar-section-start">
           <h1 class="md-title">家計簿リスト</h1>
-
           <body>
             <slot name="body"></slot>
           </body>
           <md-button @click="resetList" class="table-header-button">検索クリアー</md-button>
         </div>
-
         <md-field md-clearable class="md-toolbar-section-end">
-
           <md-select v-model="selectedDay" @input="searchOnTableDte" name="dateSelect" id="dateSelect" class="date-input-fealds" placeholder="日時指定">
-            <template v-for="(year, index) in dayObj">
-              <md-optgroup :label="index">
-                <template v-for="date in year">
+            <template v-for="(year, index) in Object.keys(dayObj).reverse()">
+              <md-optgroup :label="year">
+                <template v-for="date in objectSort(dayObj[year], false)">
                   <md-option :value="date.value">{{date.date}}</md-option>
                 </template>
               </md-optgroup>
             </template>
           </md-select>
-
           <md-input placeholder="支払い者検索" v-model="search" @input="searchOnTable" class="find"/>
         </md-field>
       </md-table-toolbar>
+
+      <md-table-row slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
+        <md-table-cell md-label="日付" md-sort-by="date">{{ item.date }}</md-table-cell>
+        <md-table-cell md-label="種別" md-sort-by="type">{{ item.type }}</md-table-cell>
+        <md-table-cell md-label="価格" md-sort-by="cost">{{ item.cost }}</md-table-cell>
+        <md-table-cell md-label="支払い者" md-sort-by="payment">{{ item.payment }}</md-table-cell>
+      </md-table-row>
 
       <md-table-empty-state
         md-label="検索結果ぜろー"
@@ -40,19 +43,15 @@
         <img src="../assets/loading.gif">
       </md-table-empty-state>
 
-
-      <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="日付" md-sort-by="date">{{ item.date }}</md-table-cell>
-        <md-table-cell md-label="種別" md-sort-by="type">{{ item.type }}</md-table-cell>
-        <md-table-cell md-label="価格" md-sort-by="cost">{{ item.cost }}</md-table-cell>
-        <md-table-cell md-label="支払い者" md-sort-by="payment">{{ item.payment }}</md-table-cell>
-      </md-table-row>
     </md-table>
     <Chart :data='searched'></Chart>
   </div>
 </template>
 
 <script>
+import Chart from '../components/homebookChart'
+import Modal from './Modal'
+
 const toLower = text => {
   return text.toString().toLowerCase()
 }
@@ -80,9 +79,6 @@ const colorList = [
   'rgba(129, 176, 152, 0.5)',
   'rgba(47, 105, 65, 0.5)'
 ]
-
-import Chart from '../components/homebookChart'
-
 export default {
   name: 'TableSearch',
   data: () => ({
@@ -102,7 +98,8 @@ export default {
     'items'
   ],
   components: {
-    Chart
+    Chart,
+    Modal
   },
   methods: {
     newInput () {
@@ -145,7 +142,15 @@ export default {
           }]
         }
       }
-      this.dayObj = obj
+      // console.log(obj)
+      obj = this.objectSort(obj, true)
+      let resultDateObj = {}
+      Object.keys(obj).forEach(key => {
+        resultDateObj[key] = obj[key].sort((a, b) => {
+          return Number(a.date) < Number(b.date) ? 1 : -1
+        })
+      })
+      this.dayObj = resultDateObj
     },
     sortFunc (arr) {
       arr.sort(function (a, b) {
@@ -261,9 +266,23 @@ export default {
           data: data
         }]
       }
-      console.log('allGenre', this.allGenreDonuts)
+      // console.log('allGenre', this.allGenreDonuts)
       this.totalCost = costs
       return datas
+    },
+    objectSort (object, abs = true) {
+      var result = {}
+      var array = []
+      for (let key in object) {
+        if (object.hasOwnProperty(key)) {
+          array.push(Number(key))
+        }
+      }
+      abs ? array.sort() : array.reverse()
+      for (let i = 0; i < array.length; i++) {
+        result[array[i]] = object[array[i]]
+      }
+      return result
     },
     setPaymentRate () {
       let data = Object.assign({}, this.searched)
@@ -289,7 +308,7 @@ export default {
         ]
       }
 
-      console.log('paymentRate', this.paymentRate)
+      // console.log('paymentRate', this.paymentRate)
       return datas
     },
     setDailyCosts () {
@@ -350,7 +369,7 @@ export default {
         datasets: datasets
       }
 
-      console.log('dailyCosts', this.dailyCosts)
+      // console.log('dailyCosts', this.dailyCosts)
       return datasets
     },
     getPaymentCosts (payment) {
@@ -369,8 +388,6 @@ export default {
           }
         }
       }
-      console.log('tyeps:_', types)
-      console.log('datas:_', datas)
       let result = {
         labels: types,
         datasets: [
@@ -383,6 +400,15 @@ export default {
       }
       this.totalCosts[payment] = costs
       return result
+    },
+    getClass: ({ id }) => ({
+      'md-primary': id === 2,
+      'md-accent': id === 3
+    }),
+    onSelect (item) {
+      // this.selected = item
+      // console.log(item)
+      this.$emit('showEditModal', item)
     }
   },
   created () {

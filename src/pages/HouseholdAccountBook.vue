@@ -1,8 +1,9 @@
 <template>
   <div class="HouseHold">
-    <houseTable :items='costData' @showInputModal='showModal'>
+    <houseTable :items='costData' @showInputModal='showModal' @showEditModal='showEditModal'>
       <md-button slot="body" class="md-primary newInput" @click="showModal">新規追加</md-button>
     </houseTable>
+
     <Modal ref='modal'>
       <div class="md-title" slot="header">新規追加</div>
 
@@ -53,10 +54,56 @@
         </div>
         <md-button class="md-icon-button md-primary" @click="pushNewData"><md-icon>add_circle</md-icon></md-button>
         <md-button class="md-icon-button md-accent" @click="popNewData"><md-icon>remove_circle</md-icon></md-button>
-        <md-button class="md-raised md-primary" @click="saveData">トーロク</md-button>
+        <md-button class="md-raised md-primary" @click="addData">トーロク</md-button>
         <md-button class="md-raised" @click="closeModal">モドル</md-button>
       </div>
 
+    </Modal>
+
+    <Modal ref='editModal'>
+      <div class="md-title" slot="header">変更</div>
+      <div class="md-layout md-gutter margin100" slot="body">
+        <form novalidate class="md-layout">
+          <div class="md-layout md-gutter">
+            <div class="md-layout-item md-small-size-100">
+              <md-field>
+                <label for="Date">日付</label>
+                <md-datepicker name='Date' v-model="editData.date" :md-open-on-focus="false"/>
+              </md-field>
+            </div>
+            <div class="md-layout-item md-small-size-100">
+              <md-field>
+                <label for="type">種別</label>
+                <md-select v-model="editData.type" name="type" id="type">
+                  <template v-for="type in types">
+                    <md-option :value="type">{{type}}</md-option>
+                  </template>
+                </md-select>
+              </md-field>
+            </div>
+            <div class="md-layout-item md-small-size-100">
+              <md-field>
+                <label for="costs">価格</label>
+                <md-input name='costs' v-model="editData.cost" type="number" min='0'></md-input>
+              </md-field>
+            </div>
+            <div class="md-layout-item md-small-size-100">
+              <md-field>
+                <label for="payment">支払い者</label>
+                <md-select v-model="editData.payment" name="payment" id="payment">
+                  <template v-for="payment in payments">
+                    <md-option :value="payment">{{payment}}</md-option>
+                  </template>
+                </md-select>
+              </md-field>
+            </div>
+          </div>
+        </form>
+        <div>
+          <md-button class="md-raised md-primary" @click="saveData">コーシン</md-button>
+          <md-button class="md-raised" @click="closeEditModal">モドル</md-button>
+        </div>
+      </div>
     </Modal>
   </div>
 </template>
@@ -75,6 +122,8 @@ export default {
     costDB: '',
     costData: {},
     newDatas: [],
+    userEmail: '',
+    editData: {},
     today: '',
     payments: [
       'Hajime',
@@ -92,11 +141,19 @@ export default {
     houseTable,
     Modal
   },
+  computed: {
+    userName () {
+      if (!this.userEmail) return ''
+      return this.userEmail.indexOf('3110') > 0 ? 'Hajime' : 'Shiori'
+    }
+  },
   methods: {
     syncFirebase () {
       let listObj = []
       this.costDB.on('child_added', function (fbdata) {
-        listObj.push(fbdata.val())
+        let data = fbdata.val()
+        data.fbKey = fbdata.key
+        listObj.push(data)
       })
       this.costData = listObj
     },
@@ -108,21 +165,29 @@ export default {
     showModal () {
       this.$refs.modal.modalControl(true)
     },
+    showEditModal (item) {
+      this.editData = Object.assign({}, item)
+      this.$refs.editModal.modalControl(true)
+    },
     closeModal () {
       this.$refs.modal.modalControl(false)
+      this.newDatas = {}
+    },
+    closeEditModal () {
+      this.$refs.editModal.modalControl(false)
     },
     pushNewData () {
       this.newDatas.push({
         date: this.today,
         cost: 0,
-        payment: '',
+        payment: this.userName,
         type: 'foods'
       })
     },
     popNewData () {
       this.newDatas.pop()
     },
-    saveData () {
+    addData () {
       let dataset = this.newDatas
       for (var key in dataset) {
         let tmpDate = new Date(Date.parse(dataset[key].date))
@@ -130,24 +195,39 @@ export default {
         this.costDB.push(dataset[key])
       }
       this.closeModal()
+    },
+    saveData () {
+      const result = {
+        date: this.setDate(this.editData.date),
+        cost: this.editData.cost,
+        payment: this.editData.payment,
+        type: this.editData.type
+      }
+      this.costDB.child(this.editData.fbKey).update(result)
+      this.closeEditModal()
+      location.reload()
+    },
+    initializeData (name = '') {
+      this.newDatas.push({
+        date: this.today,
+        cost: 0,
+        payment: name.indexOf('3110') > 0 ? 'Hajime' : 'Shiori',
+        type: 'foods'
+      })
     }
   },
   created () {
     const that = this
     let now = new Date()
     this.today = this.setDate(now)
-    this.newDatas.push({
-      date: this.today,
-      cost: 0,
-      payment: '',
-      type: 'foods'
-    })
 
     this.fireDB = !firebase.app.length ? firebase.initializeApp(firebaseConf) : firebase.app()
     this.costDB = this.fireDB.database().ref('costs')
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.syncFirebase()
+        this.userEmail = String(user.email)
+        this.initializeData(user.email)
       } else {
         alert('ログインしてね♪')
         that.$router.push('/')
@@ -191,5 +271,9 @@ a {
 
 .md-table {
   max-height: 60Vh
+}
+
+.margin100 {
+  margin: 20px 50px !important;
 }
 </style>

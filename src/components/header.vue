@@ -151,7 +151,7 @@ export default {
     setAlert (msg) {
       this.message = msg
       this.activeAlert = true
-      console.log('wored!!')
+      // console.log('wored!!')
     },
     reflogin () {
       this.$refs.logincom.login()
