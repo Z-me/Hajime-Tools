@@ -3,8 +3,10 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import VueMaterial from 'vue-material'
-import 'vue-material/dist/vue-material.min.css'
+// import VueMaterial from 'vue-material'
+// import 'vue-material/dist/vue-material.min.css'
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
 import Vuelidate from 'vuelidate'
 import VueVideoPlayer from 'vue-video-player'
 import firebase from 'firebase'
@@ -13,7 +15,8 @@ import firebaseEnv from './.firebaseEnv.json'
 firebase.initializeApp(firebaseEnv)
 
 Vue.config.productionTip = false
-Vue.use(VueMaterial)
+// Vue.use(VueMaterial)
+Vue.use(Vuetify)
 Vue.use(VueVideoPlayer)
 Vue.use(firebase)
 Vue.use(Vuelidate)

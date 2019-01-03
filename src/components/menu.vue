@@ -1,8 +1,130 @@
 <template>
-  <div class="header">
+  <div class="vue-menu">
+    <div
+      class="hide-overflow"
+      style="position: relative;">
+      <v-toolbar
+        absolute
+        color="indigo"
+        dark
+        scroll-off-screen
+        scroll-target="#main-content"
+        >
+        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-title><h2 style="flex: 1">Hajime Tools</h2></v-toolbar-title>
+        <v-spacer></v-spacer>
 
+        <v-btn
+          small
+          round
+          v-if="!loginState"
+          @click="showLogin = true"
+          >
+          ログイン
+          <v-icon>assignment_ind</v-icon>
+        </v-btn>
 
+        <v-toolbar-title v-else-if="loginState">{{nowUserName}}</v-toolbar-title>
+        <v-btn
+          small
+          round
+          color="pink darken-1"
+          v-if="loginState"
+          @click="logout()"
+          >
+          ログアウト
+          <v-icon>directions_walk</v-icon>
+        </v-btn>
+<!--
+        <v-btn icon small v-if="!loginState" @click="showLogin = true">
+          <v-icon>assignment_ind</v-icon>
+          ログイン
+        </v-btn>
+        <v-btn icon small v-else v-on:click="logout()">
+          <v-icon>assignment_ind</v-icon>
+          ログアウト
+        </button>
+-->
+      </v-toolbar>
+      <div
+        id="scrolling-techniques"
+        class="scroll-y"
+        style="max-height: 100vh; padding-top: 30px;"
+        >
+        <v-container>
+          <slot name="main-container"></slot>
+        </v-container>
+      </div>
+    </div>
 
+    <div class="side-menu">
+      <v-layout
+        wrap
+        style="height: 100vh;"
+      >
+        <v-navigation-drawer
+          v-model="drawer"
+          :mini-variant="mini"
+          absolute
+          temporary
+          >
+          <v-list class="pa-1">
+            <v-list-tile v-if="mini" @click.stop="mini = !mini">
+              <v-list-tile-action>
+                <v-icon>chevron_right</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+
+            <v-list-tile avatar tag="div">
+              <v-list-tile-avatar>
+                <img src="../assets/Kirby.png">
+              </v-list-tile-avatar>
+
+              <v-list-tile-content>
+                <v-list-tile-title>Hajime-Tools</v-list-tile-title>
+              </v-list-tile-content>
+
+              <v-list-tile-action>
+                <v-btn icon @click.stop="mini = !mini">
+                  <v-icon>chevron_left</v-icon>
+                </v-btn>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+
+          <v-list class="pt-0" dense>
+            <v-divider light></v-divider>
+
+            <v-list-tile
+              v-for="item in items"
+              :key="item.title"
+              @click=""
+              >
+              <v-list-tile-action>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-tile-action>
+
+              <v-list-tile-content>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-navigation-drawer>
+      </v-layout>
+    </div>
+
+    <Modal v-if="showLogin" @close="showLogin = false">
+      <h2 slot="header">Login</h2>
+      <Login slot="body" ref="logincom" @sendAlert="setAlert" msg=""></Login>
+      <div slot="footer">
+        <md-button class="md-raised md-primary" @click="reflogin">ログインn</md-button>
+        <md-button class="md-raised md-accent">シンキ サクセイ</md-button>
+        <button class="md-button md-raised md-warn" v-on:click="showLogin = false">
+          モドル
+        </button>
+      </div>
+    </Modal>
+<!--
     <md-app md-mode="reveal">
       <md-app-toolbar class="md-primary">
         <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
@@ -17,7 +139,7 @@
         <md-list>
           <md-list-item>
             <md-icon>move_to_inbox</md-icon>
-            <!-- <span class="md-list-item-text">Inbox</span> -->
+            <!-- <span class="md-list-item-text">Inbox</span> --
             <router-link to="/" class="md-list-item-text">メモ</router-link>
           </md-list-item>
 
@@ -121,15 +243,26 @@ import Modal from '@/components/Modal'
 import Login from '@/components/Login'
 import firebase from 'firebase'
 export default {
-  name: 'header',
+  name: 'vue-menu',
   components: {
     Modal,
     Login
   },
   data: () => ({
     menuVisible: false,
+    drawer: null,
+    items: [
+      { title: '音声入力メモ', icon: 'mic', routers: 'Memo' },
+      { title: '健康チェク', icon: 'directions_walk', routers: 'Health' },
+      { title: '家計簿', icon: 'attach_money', routers: 'HouseholdAccountBook' },
+      { title: 'KPT', icon: 'loop', routers: 'KPT' },
+      { title: 'Video', icon: 'video_library', routers: 'VideoPlayer' }
+    ],
+    mini: false,
+    right: null,
     showLogin: false,
     loginState: false,
+    nowUserName: '',
     message: 'test comment',
     showSnackbar: false,
     position: 'center',
@@ -169,6 +302,8 @@ export default {
   created () {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
+        console.log('user', user.email)
+        this.nowUserName = user.email.replace('@gmail.com', '')
         this.loginState = true
       } else {
         this.loginState = false

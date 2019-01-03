@@ -1,5 +1,11 @@
 <template>
   <div id="app">
+    <vue-menu>
+      <div slot="main-container">
+        <router-view class="main-content"></router-view>
+      </div>
+    </vue-menu>
+    <!--
     <div class="main-content">
 
       <md-app md-waterfall md-mode="fixed-last">
@@ -102,7 +108,7 @@
       <md-button class="md-primary" @click="showSnackbar = false">閉じる</md-button>
     </md-snackbar>
 
-    </div>
+  </div> -->
   </div>
 </template>
 
@@ -110,10 +116,12 @@
 import firebase from 'firebase'
 import Modal from '@/components/Modal'
 import Login from '@/components/login'
+import VueMenu from '@/components/menu'
 export default {
   name: 'app',
   components: {
     Modal,
+    VueMenu,
     Login
   },
   data: () => ({
