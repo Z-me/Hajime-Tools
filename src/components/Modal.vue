@@ -20,29 +20,6 @@
       </v-card>
     </v-dialog>
   </div>
-  <!--
-  <div class="modal">
-
-    <md-dialog :md-active.sync="showModal" class="modalContents">
-      <header>
-        <slot name="header"></slot>
-      </header>
-      <main>
-        <slot></slot>
-      </main>
-      <body>
-        <slot name="body"></slot>
-      </body>
-      <footer>
-        <slot name="footer"></slot>
-      </footer>
-      <md-dialog-actions>
-        <md-button class="md-raised md-primary" @click="showModal = false">Close</md-button>
-        <md-button class="md-raised" @click="showModal = false">{{message}}</md-button>
-      </md-dialog-actions>
-    </md-dialog>
-  </div>
--->
 </template>
 
 <script>
@@ -52,8 +29,7 @@ export default {
     'show'
   ],
   data: () => ({
-    showModal: false,
-    message: 'hogehoge'
+    showModal: false
   }),
   methods: {
     modalControl (state) {
