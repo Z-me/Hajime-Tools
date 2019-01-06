@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <vue-menu>
+    <vue-menu @login="login" @logout="logout" @snack="setSnackbar">
       <div slot="main-container">
         <router-view class="main-content"></router-view>
       </div>
@@ -113,20 +113,19 @@
 </template>
 
 <script>
-import firebase from 'firebase'
-import Modal from '@/components/Modal'
-import Login from '@/components/login'
+// import firebase from 'firebase'
+// import Auth from '@/lib/Auth'
+// import Modal from '@/components/Modal'
 import VueMenu from '@/components/menu'
 export default {
   name: 'app',
   components: {
-    Modal,
-    VueMenu,
-    Login
+    // Modal,
+    VueMenu
   },
   data: () => ({
+    auth: null,
     menuVisible: false,
-    showLogin: false,
     loginState: false,
     message: 'test comment',
     showSnackbar: false,
@@ -135,34 +134,43 @@ export default {
     snackbarMessage: ''
   }),
   methods: {
+    async login (mail, password) {
+      let res = await this.auth.login(mail, password)
+      console.log('res', res.result)
+      if (res.result) {
+        // TODO: set Snackbar
+        return res.result
+      }
+    },
+    logout () {
+      this.auth.logout()
+      /*
+      firebase.auth().signOut().then(function () {
+        console.log('logout success')
+      }).catch(function (error) {
+        console.log('logout false', error)
+      }) */
+    },
     showLoginModal () {
       this.$refs.modal.modalControl(true)
     },
     closeModal (state) {
       this.$refs.modal.modalControl(false)
     },
-    logout () {
-      firebase.auth().signOut().then(function () {
-        console.log('logout success')
-      }).catch(function (error) {
-        console.log('logout false', error)
-      })
-    },
     setSnackbar (msg) {
       this.snackbarMessage = msg
       this.showSnackbar = true
-    }
+    } /* ,
+    setUserAuth () {
+      this.userName = this.auth.getUser()
+      this.isLogin = this.auth.checkLogin()
+    } */
   },
   created () {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.message = `${user.email}でログイン中だよ`
-        this.loginState = true
-      } else {
-        this.message = `ログインしてないよ`
-        this.loginState = false
-      }
-    })
+    // this.auth = new Auth()
+  },
+  mounted () {
+    // setTimeout(this.setUserAuth, 2000)
   }
 }
 </script>

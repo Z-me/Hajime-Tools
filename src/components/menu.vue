@@ -8,51 +8,43 @@
         color="indigo"
         dark
         scroll-off-screen
-        scroll-target="#main-content"
+        scroll-target="#main-container"
         >
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-toolbar-title><h2 style="flex: 1">Hajime Tools</h2></v-toolbar-title>
         <v-spacer></v-spacer>
 
         <v-btn
+          :loading="authLoading"
           small
           round
-          v-if="!loginState"
+          color="teal accent-4"
+          v-if="!authIsLogin"
           @click="showLogin = true"
           >
-          ログイン
           <v-icon>assignment_ind</v-icon>
+          ログイン
         </v-btn>
 
-        <v-toolbar-title v-else-if="loginState">{{nowUserName}}</v-toolbar-title>
+        <v-toolbar-title v-else-if="authIsLogin">{{authEmail}}</v-toolbar-title>
         <v-btn
           small
           round
           color="pink darken-1"
-          v-if="loginState"
+          v-if="authIsLogin"
           @click="logout()"
           >
-          ログアウト
           <v-icon>directions_walk</v-icon>
-        </v-btn>
-<!--
-        <v-btn icon small v-if="!loginState" @click="showLogin = true">
-          <v-icon>assignment_ind</v-icon>
-          ログイン
-        </v-btn>
-        <v-btn icon small v-else v-on:click="logout()">
-          <v-icon>assignment_ind</v-icon>
           ログアウト
-        </button>
--->
+        </v-btn>
       </v-toolbar>
       <div
         id="scrolling-techniques"
         class="scroll-y"
-        style="max-height: 100vh; padding-top: 30px;"
+        style="max-height: 100vh; padding-top: 60px !important;"
         >
-        <v-container>
-          <slot name="main-container"></slot>
+        <v-container style="height: 100vh;">
+          <slot name="main-container" id="main-container" style="max-height: 100vh;"></slot>
         </v-container>
       </div>
     </div>
@@ -60,7 +52,6 @@
     <div class="side-menu">
       <v-layout
         wrap
-        style="height: 100vh;"
       >
         <v-navigation-drawer
           v-model="drawer"
@@ -100,12 +91,13 @@
               :key="item.title"
               @click=""
               >
-              <v-list-tile-action>
+              <v-list-tile-action v-if="showMenueItem(item.isAuth)">
                 <v-icon>{{ item.icon }}</v-icon>
               </v-list-tile-action>
 
-              <v-list-tile-content>
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              <v-list-tile-content v-if="showMenueItem(item.isAuth)">
+                <router-link :to="item.routers" tag="v-list-tile-title">{{ item.title }}</router-link>
+                <!-- <v-list-tile-title>{{ item.title }}</v-list-tile-title> -->
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -113,6 +105,25 @@
       </v-layout>
     </div>
 
+    <modal :show="showLogin">
+      <div slot="title">ログイン</div>
+      <login slot="contents" :auth.sync="newAuth"></login>
+      <div slot="action">
+        <v-btn color="teal accent-4" flat @click="login">ログイン</v-btn>
+        <v-btn color="pink darken-1" flat>モドル</v-btn>
+      </div>
+    </modal>
+    <modal :show="showLogout">
+      <div slot="title">ログアウト</div>
+      <div slot="contents">
+        本当に
+      </div>
+      <div slot="action">
+        <v-btn color="teal accent-4" flat @click="logout">ログアウト</v-btn>
+        <v-btn color="pink darken-1" flat>キャンセル</v-btn>
+      </div>
+    </modal>
+<!--
     <Modal v-if="showLogin" @close="showLogin = false">
       <h2 slot="header">Login</h2>
       <Login slot="body" ref="logincom" @sendAlert="setAlert" msg=""></Login>
@@ -124,7 +135,7 @@
         </button>
       </div>
     </Modal>
-<!--
+
     <md-app md-mode="reveal">
       <md-app-toolbar class="md-primary">
         <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
@@ -240,8 +251,9 @@
 
 <script>
 import Modal from '@/components/Modal'
-import Login from '@/components/Login'
-import firebase from 'firebase'
+import Login from '@/parts/login'
+import Auth from '@/lib/Auth'
+// import firebase from 'firebase'
 export default {
   name: 'vue-menu',
   components: {
@@ -252,24 +264,33 @@ export default {
     menuVisible: false,
     drawer: null,
     items: [
-      { title: '音声入力メモ', icon: 'mic', routers: 'Memo' },
-      { title: '健康チェク', icon: 'directions_walk', routers: 'Health' },
-      { title: '家計簿', icon: 'attach_money', routers: 'HouseholdAccountBook' },
-      { title: 'KPT', icon: 'loop', routers: 'KPT' },
-      { title: 'Video', icon: 'video_library', routers: 'VideoPlayer' }
+      { title: 'Home', icon: 'home', routers: '/', isAuth: false },
+      { title: '音声入力メモ', icon: 'mic', routers: '/memo', isAuth: true },
+      { title: '健康チェク', icon: 'directions_walk', routers: '/helth', isAuth: true },
+      { title: '家計簿', icon: 'attach_money', routers: '/house', isAuth: true },
+      { title: 'KPT', icon: 'loop', routers: '/kpt', isAuth: true },
+      { title: 'Video', icon: 'video_library', routers: '/video-player', isAuth: true }
     ],
     mini: false,
     right: null,
     showLogin: false,
+    showLogout: false,
+    Auth: null,
+    newAuth: {
+      'mail': '',
+      'password': ''
+    },
+    authEmail: '',
+    authIsLogin: false,
+    authLoading: true,
     loginState: false,
-    nowUserName: '',
-    message: 'test comment',
     showSnackbar: false,
     position: 'center',
     duration: 4000,
     isInfinity: false
   }),
   methods: {
+    /*
     open (which, e) {
       e.preventDefault()
       if (Modal.active !== null) {
@@ -297,18 +318,41 @@ export default {
       }).catch(function (error) {
         alertFunc('ログアウトに失敗しました。ERROR_CODE:' + error.code)
       })
+    } */
+    async login () {
+      if (await this.Auth.login(this.newAuth.mail, this.newAuth.password)) {
+        this.showLogin = false
+        this.setAuthInfo()
+      }
+      /*
+      if (this.$emit('login', this.auth.mail, this.auth.password)) {
+        this.showLogin = false
+      } */
+      this.newAuth = {
+        'mail': '',
+        'password': ''
+      }
+    },
+    async logout () {
+      if (await this.Auth.logout()) {
+        this.setAuthInfo()
+      }
+      // this.$emit('logout')
+    },
+    async setAuthInfo () {
+      this.Auth = await new Auth()
+      setTimeout(() => {
+        this.authEmail = this.Auth.getUser()
+        this.authIsLogin = this.Auth.checkLogin()
+        this.authLoading = false
+      }, 1000)
+    },
+    showMenueItem (authShow) {
+      return authShow ? this.authIsLogin : true
     }
   },
-  created () {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        console.log('user', user.email)
-        this.nowUserName = user.email.replace('@gmail.com', '')
-        this.loginState = true
-      } else {
-        this.loginState = false
-      }
-    })
+  mounted () {
+    this.setAuthInfo()
   }
 }
 </script>
