@@ -32,7 +32,7 @@
           round
           color="pink darken-1"
           v-if="authIsLogin"
-          @click="logout()"
+          @click="showLogout = true"
           >
           <v-icon>directions_walk</v-icon>
           ログアウト
@@ -97,7 +97,6 @@
 
               <v-list-tile-content v-if="showMenueItem(item.isAuth)">
                 <router-link :to="item.routers" tag="v-list-tile-title">{{ item.title }}</router-link>
-                <!-- <v-list-tile-title>{{ item.title }}</v-list-tile-title> -->
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -110,17 +109,17 @@
       <login slot="contents" :auth.sync="newAuth"></login>
       <div slot="action">
         <v-btn color="teal accent-4" flat @click="login">ログイン</v-btn>
-        <v-btn color="pink darken-1" flat>モドル</v-btn>
+        <v-btn color="pink darken-1" flat @click="showLogin = false">モドル</v-btn>
       </div>
     </modal>
     <modal :show="showLogout">
       <div slot="title">ログアウト</div>
       <div slot="contents">
-        本当に
+        <h2>本当にHajime-Toolからログアウトしますか?</h2>
       </div>
       <div slot="action">
         <v-btn color="teal accent-4" flat @click="logout">ログアウト</v-btn>
-        <v-btn color="pink darken-1" flat>キャンセル</v-btn>
+        <v-btn color="pink darken-1" flat @click="showLogout = false">キャンセル</v-btn>
       </div>
     </modal>
   </div>
@@ -160,7 +159,7 @@ export default {
     authIsLogin: false,
     authLoading: true,
     loginState: false,
-    showSnackbar: false,
+    // showSnackbar: false,
     position: 'center',
     duration: 4000,
     isInfinity: false
@@ -168,8 +167,11 @@ export default {
   methods: {
     async login () {
       if (await this.Auth.login(this.newAuth.mail, this.newAuth.password)) {
+        this.showSnackbar('success', 'ログインに成功しました')
         this.showLogin = false
         this.setAuthInfo()
+      } else {
+        this.showSnackbar('error', 'ログインに失敗しました')
       }
       this.newAuth = {
         'mail': '',
@@ -178,7 +180,11 @@ export default {
     },
     async logout () {
       if (await this.Auth.logout()) {
+        this.showSnackbar('success', 'ログアウトしました')
+        this.showLogout = false
         this.setAuthInfo()
+      } else {
+        this.showSnackbar('error', 'ログアウトに失敗しました')
       }
     },
     async setAuthInfo () {
@@ -191,6 +197,9 @@ export default {
     },
     showMenueItem (authShow) {
       return authShow ? this.authIsLogin : true
+    },
+    showSnackbar (type, message) {
+      this.$emit('snack', type, message)
     }
   },
   mounted () {

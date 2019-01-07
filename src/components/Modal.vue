@@ -5,7 +5,7 @@
       width="500px"
       >
       <v-card>
-        <v-card-title primary-title class="grey lighten-2">
+        <v-card-title primary-title class="blue lighten-2">
           <h2><slot name="title"></slot></h2>
         </v-card-title>
 

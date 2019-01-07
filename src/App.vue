@@ -5,6 +5,23 @@
         <router-view class="main-content"></router-view>
       </div>
     </vue-menu>
+    <v-snackbar
+      v-model="showSnackbar"
+      :color="snackbarColor"
+      :timeout="snackbarTimeout"
+      multi-line
+      bottom
+      right
+      >
+      {{ snackbarMessage }}
+      <v-btn
+        dark
+        flat
+        @click="showSnackbar = false"
+        >
+        閉じる
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -21,9 +38,11 @@ export default {
     loginState: false,
     message: 'test comment',
     showSnackbar: false,
+    snackbarColor: 'cyan darken-2',
+    snackbarMessage: '',
+    snackbarTimeout: 3000,
     position: 'center',
-    duration: 4000,
-    snackbarMessage: ''
+    duration: 4000
   }),
   methods: {
     showLoginModal () {
@@ -32,8 +51,9 @@ export default {
     closeModal (state) {
       this.$refs.modal.modalControl(false)
     },
-    setSnackbar (msg) {
+    setSnackbar (type, msg) {
       this.snackbarMessage = msg
+      this.snackbarColor = type === 'success' ? 'cyan darken-2' : 'pink accent-2'
       this.showSnackbar = true
     }
   }
@@ -56,6 +76,7 @@ input {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/*
 .md-app {
   border: 1px solid rgba(#000, .12);
   height: 100vh !important;
@@ -137,4 +158,5 @@ input {
 select[name=dateSelect]::placeholder {
   color: #FFF !important;
 }
+*/
 </style>
