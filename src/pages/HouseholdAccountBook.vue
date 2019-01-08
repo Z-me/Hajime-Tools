@@ -111,7 +111,6 @@
 <script>
 import houseTable from '@/components/table'
 import Modal from '@/components/Modal'
-import VoiceInput from '@/components/Voice_input'
 import firebase from 'firebase'
 import firebaseConf from '../.firebaseEnv.json'
 
@@ -137,7 +136,6 @@ export default {
     ]
   }),
   components: {
-    VoiceInput,
     houseTable,
     Modal
   },
