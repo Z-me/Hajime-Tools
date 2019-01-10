@@ -146,9 +146,9 @@ export default {
     }
   },
   methods: {
-    syncFirebase () {
+    async syncFirebase () {
       let listObj = []
-      this.costDB.on('child_added', function (fbdata) {
+      await this.costDB.on('child_added', (fbdata) => {
         let data = fbdata.val()
         data.fbKey = fbdata.key
         listObj.push(data)

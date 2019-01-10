@@ -1,98 +1,124 @@
 <template>
   <div>
-    <md-table v-model="searched" md-sort="date" md-sort-order="asc" md-fixed-header @md-selected="onSelect">
-      <md-table-toolbar>
-        <div class="md-toolbar-section-start">
-          <h1 class="md-title">家計簿リスト</h1>
-          <body>
-            <slot name="body"></slot>
-          </body>
-          <md-button @click="resetList" class="table-header-button">検索クリアー</md-button>
-        </div>
-        <md-field md-clearable class="md-toolbar-section-end">
-          <md-select v-model="selectedDay" @input="searchOnTableDte" name="dateSelect" id="dateSelect" class="date-input-fealds" placeholder="日時指定">
-            <template v-for="(year, index) in Object.keys(dayObj).reverse()">
-              <md-optgroup :label="year">
-                <template v-for="date in objectSort(dayObj[year], false)">
-                  <md-option :value="date.value">{{date.date}}</md-option>
-                </template>
-              </md-optgroup>
-            </template>
-          </md-select>
-          <md-input placeholder="支払い者検索" v-model="search" @input="searchOnTable" class="find"/>
-        </md-field>
-      </md-table-toolbar>
+    <v-card>
+      <v-card-title>
+        家計簿リスト
+        <v-spacer></v-spacer>
+        <v-btn
+          dark
+          round
+          color="teal accent-4"
+          @click="clearFilter">
+          新規登録
+        </v-btn>
 
-      <md-table-row slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
-        <md-table-cell md-label="日付" md-sort-by="date">{{ item.date }}</md-table-cell>
-        <md-table-cell md-label="種別" md-sort-by="type">{{ item.type }}</md-table-cell>
-        <md-table-cell md-label="価格" md-sort-by="cost">{{ item.cost }}</md-table-cell>
-        <md-table-cell md-label="支払い者" md-sort-by="payment">{{ item.payment }}</md-table-cell>
-      </md-table-row>
+        <v-text-field
+          v-model="yearFilter"
+          type="number"
+          min="2017"
+          label="日付フィルタ(年)"
+          >
+        </v-text-field>
+        <v-text-field
+          v-show="yearFilter"
+          v-model="monthFilter"
+          type="number"
+          min="1"
+          max="12"
+          label="(月)"
+          >
+        </v-text-field>
+        <v-text-field
+          v-show="monthFilter"
+          v-model="dayFilter"
+          type="number"
+          min="1"
+          max="31"
+          label="(日)"
+          >
+        </v-text-field>
+        <v-btn
+          v-if="yearFilter"
+          dark
+          color="pink darken-1"
+          @click="clearFilter">
+          Clear
+        </v-btn>
 
-      <md-table-empty-state
-        md-label="検索結果ぜろー"
-        :md-description="`'${search}' っていう検索条件に当てはまるデータはないっすねぇ`"
-        v-if="search != null ">
-        <md-button class="md-primary md-raised" @click="newInput">情報追加</md-button>
-      </md-table-empty-state>
-      <md-table-empty-state
-        md-label="NOW LOADING"
-        class="bgblack"
-        v-else>
-        <img src="../assets/loading.gif">
-      </md-table-empty-state>
 
-    </md-table>
-    <Chart :data='searched'></Chart>
+      </v-card-title>
+
+      <v-data-table
+        :headers="headers"
+        :items="searched"
+        :loading="isLoading"
+        :pagination.sync="pagination"
+        >
+        <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+        <template slot="items" slot-scope="props">
+          <td><h3>{{ setdateFormat(props.item.date) }}</h3></td>
+          <td><h3>{{ setTypeJp(props.item.type) }}</h3></td>
+          <td><h3>{{ props.item.cost | costFilter }}</h3></td>
+          <td><h3>{{ props.item.payment }}</h3></td>
+        </template>
+      </v-data-table>
+    </v-card>
+    <chart :data='searched' :isLoading="isLoading"></chart>
   </div>
 </template>
 
 <script>
 import Chart from '../components/homebookChart'
+import moment from 'moment'
 import Modal from './Modal'
 
-const toLower = text => {
-  return text.toString().toLowerCase()
+const typeTable = {
+  'utility': '光熱費',
+  'foods': '食費',
+  'Sundries': '雑貨',
+  'rent': '家賃'
 }
-const searchByPayment = (items, term) => {
-  if (term !== null) {
-    return items.filter(item => toLower(item.payment).includes(toLower(term)))
-  }
-  return items
-}
-const searchByDate = (items, term) => {
-  if (term !== null) {
-    return items.filter(item => item.date.includes(term))
-  }
-  return items
-}
-const colorList = [
-  'rgba(186, 0, 0, 0.5)',
-  'rgba(129, 255, 4, 0.5)',
-  'rgba(255, 0, 0, 0.5)',
-  'rgba(109, 0, 180, 0.5)',
-  'rgba(0, 56, 255, 0.5)',
-  'rgba(255, 252, 0, 0.5)',
-  'rgba(0, 0, 0, 0.5)',
-  'rgba(181, 31, 255, 0.5)',
-  'rgba(129, 176, 152, 0.5)',
-  'rgba(47, 105, 65, 0.5)'
-]
+
 export default {
   name: 'TableSearch',
   data: () => ({
-    search: null,
+    headers: [
+      {
+        text: '日付',
+        aligh: 'right',
+        sortale: true,
+        value: 'date'
+      },
+      {
+        text: '種別',
+        aligh: 'left',
+        sortale: true,
+        value: 'type'
+      },
+      {
+        text: '価格',
+        aligh: 'right',
+        sortale: true,
+        value: 'cost'
+      },
+      {
+        text: '支払者',
+        aligh: 'right',
+        sortale: false,
+        value: 'payment'
+      }
+    ],
+    pagination: {
+      sortBy: 'date',
+      descending: true,
+      rowsPerPage: 10
+    },
+    // search: null,
+    yearFilter: '',
+    monthFilter: '',
+    dayFilter: '',
     searched: [],
-    dayObj: {},
-    selectedDay: 'All Data in List',
-    chartData: null,
-    allGenreDonuts: null,
-    paymentRate: null,
-    dailyCosts: null,
-    totalCost: 0,
-    totalCosts: {},
-    shareCosts: 0
+    selectedDay: 'All Data in List'
   }),
   props: [
     'items'
@@ -101,352 +127,73 @@ export default {
     Chart,
     Modal
   },
+  filters: {
+    costFilter: (value) => {
+      let formatter = new Intl.NumberFormat('ja-JP')
+      return `¥ ${formatter.format(value)}`
+    }
+  },
   methods: {
-    newInput () {
-      this.$emit('showInputModal')
-    },
-    searchOnTable () {
-      this.searched = searchByPayment(this.items, this.search)
-    },
-    searchOnTableDte () {
-      this.searchOnTable()
-      this.searched = searchByDate(this.searched, this.selectedDay)
-    },
-    resetList () {
-      this.selectedDay = null
-      this.search = []
-      this.searchOnTable()
-    },
-    checkObjectValueExist (arr, key, val) {
-      return arr.some(function (arrVal) {
-        return val === arrVal[key]
-      })
-    },
-    setDayObj () {
-      let obj = {}
-      let data = this.searched
-      for (let key in data) {
-        let dates = data[key].date
-        let date = dates.split('-')
-        if (date[0] in obj) {
-          if (!(this.checkObjectValueExist(obj[date[0]], 'date', date[1]))) {
-            obj[date[0]].push({
-              date: date[1],
-              value: date[0] + '-' + date[1]
-            })
-          }
-        } else {
-          obj[date[0]] = [{
-            date: date[1],
-            value: date[0] + '-' + date[1]
-          }]
-        }
-      }
-      // console.log(obj)
-      obj = this.objectSort(obj, true)
-      let resultDateObj = {}
-      Object.keys(obj).forEach(key => {
-        resultDateObj[key] = obj[key].sort((a, b) => {
-          return Number(a.date) < Number(b.date) ? 1 : -1
-        })
-      })
-      this.dayObj = resultDateObj
-    },
-    sortFunc (arr) {
-      arr.sort(function (a, b) {
-        if (a < b) return -1
-        if (a > b) return 1
-        return 0
-      })
-      return arr
-    },
-    validDate (y, m, d) {
-      let dt = new Date(y, m - 1, d)
-      return (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d)
-    },
-    getAllDay (startDay, endDay) {
-      let result = []
-      let start = startDay.slice(0, 7) + '-01'
-      let endDate = [
-        endDay.slice(0, 4),
-        endDay.slice(5, 7)
-      ]
-      let end = null
-      if (this.validDate(Number(endDate[0]), Number(endDate[1]), 31)) {
-        end = endDay.slice(0, 7) + '-31'
-      } else if (this.validDate(Number(endDate[0]), Number(endDate[1]), 30)) {
-        end = endDay.slice(0, 7) + '-30'
-      } else if (this.validDate(Number(endDate[0]), Number(endDate[1]), 29)) {
-        end = endDay.slice(0, 7) + '-29'
-      } else {
-        end = endDay.slice(0, 7) + '-28'
-      }
-      let inputObj = {
-        year: Number(start.slice(0, 4)),
-        month: Number(start.slice(5, 7)),
-        day: Number(start.slice(8, 10))
-      }
-      let endObj = {
-        year: Number(end.slice(0, 4)),
-        month: Number(end.slice(5, 7)),
-        day: Number(end.slice(8, 10))
-      }
-      let dateFlag = true
-      while (dateFlag) {
-        if (this.validDate(inputObj.year, inputObj.month, inputObj.day)) {
-          result.push(this.getDateString(inputObj.year, inputObj.month, inputObj.day))
-          inputObj.day++
-        } else {
-          if (this.validDate(inputObj.year, inputObj.month + 1, 1)) {
-            result.push(this.getDateString(inputObj.year, inputObj.month + 1, 1))
-            inputObj.month++
-            inputObj.day = 2
-          } else if (this.validDate(inputObj.year + 1, 1, 1)) {
-            result.push(this.getDateString(inputObj.year + 1, 1, 1))
-            inputObj.year++
-            inputObj.month = 1
-            inputObj.day = 2
-          }
-        }
-        let input = new Date(inputObj.year, inputObj.month, inputObj.day)
-        let end = new Date(endObj.year, endObj.month, endObj.day)
-        if (input > end) {
-          dateFlag = false
-        }
-      }
-      return result
-    },
     getDateString (year, month, day) {
       return year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day)
     },
-    createCalcResult () {
-      let data = Object.assign({}, this.searched)
-      let costs = {
-        Hajime: 0,
-        Shiori: 0
-      }
-      for (let key in data) {
-        costs[data[key].payment] += Math.round(Number(data[key].cost) / 2)
-        if (data[key].type === 'rent') {
-          costs[data[key].payment] -= 30000
-        }
-      }
-      this.shareCosts = costs.Hajime - costs.Shiori
-      return null
+    setdateFormat (date) {
+      return moment(new Date(date)).format('YYYY年MM月DD日')
     },
-    fillData () {
-      this.setAllGenreDonuts()
-      this.setPaymentRate()
-      this.setDailyCosts()
-      this.createCalcResult()
+    setTypeJp (type) {
+      return typeTable[type]
     },
-    setAllGenreDonuts () {
-      let labels = []
-      let datas = {}
-      let costs = 0
-      let data = Object.assign({}, this.searched)
-      for (let key in data) {
-        costs += Number(data[key].cost)
-        if (labels.indexOf(String(data[key].type)) < 0) {
-          labels.push(data[key].type)
-          datas[data[key].type] = Number(data[key].cost)
-        } else {
-          datas[data[key].type] += Number(data[key].cost)
-        }
-      }
-      data = []
-      for (let dkey in datas) {
-        data.push(datas[dkey])
-      }
-      this.allGenreDonuts = {
-        labels: labels,
-        datasets: [{
-          label: 'donuts',
-          backgroundColor: colorList,
-          data: data
-        }]
-      }
-      // console.log('allGenre', this.allGenreDonuts)
-      this.totalCost = costs
-      return datas
+    clearFilter () {
+      this.yearFilter = ''
+      this.monthFilter = ''
+      this.dayFilter = ''
+      this.itemFilter()
     },
-    objectSort (object, abs = true) {
-      var result = {}
-      var array = []
-      for (let key in object) {
-        if (object.hasOwnProperty(key)) {
-          array.push(Number(key))
-        }
+    itemFilter () {
+      if (!this.yearFilter) {
+        this.searched = this.items
+        return
       }
-      abs ? array.sort() : array.reverse()
-      for (let i = 0; i < array.length; i++) {
-        result[array[i]] = object[array[i]]
+      let inputFilter = this.yearFilter
+      if (this.monthFilter) {
+        inputFilter += `-${this.monthFilter}`
       }
-      return result
-    },
-    setPaymentRate () {
-      let data = Object.assign({}, this.searched)
-      let labels = []
-      let datas = {}
-      for (let key in data) {
-        if (labels.indexOf(String(data[key].payment)) < 0) {
-          labels.push(data[key].payment)
-          datas[data[key].payment] = Number(data[key].cost)
-        } else {
-          datas[data[key].payment] += Number(data[key].cost)
-        }
+      if (this.dayFilter) {
+        inputFilter += `-${this.dayFilter}`
       }
-      let result = Object.values(datas)
-      this.paymentRate = {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Payment Rate',
-            backgroundColor: colorList,
-            data: result
-          }
-        ]
-      }
-
-      // console.log('paymentRate', this.paymentRate)
-      return datas
-    },
-    setDailyCosts () {
-      let data = Object.assign({}, this.searched)
-      let types = ['ALL']
-      let days = []
-      let datas = {
-        'ALL': []
-      }
-      Object.keys(data).forEach(function (k) {
-        days.push(data[k].date)
+      this.searched = this.items.filter((item) => {
+        return item.date.indexOf(String(inputFilter)) > -1
       })
-      let dayRange = days.filter(function (x, i, self) {
-        return self.indexOf(x) === i
-      })
-      dayRange = Object.assign([], this.sortFunc(dayRange))
-      let startDate = dayRange[0]
-      let endDate = dayRange[dayRange.length - 1]
-      dayRange = Object.assign([], this.getAllDay(startDate, endDate))
-      dayRange = Object.assign([], this.sortFunc(dayRange))
-      for (let key in data) {
-        if (types.indexOf(String(data[key].type)) < 0) {
-          types.push(data[key].type)
-          datas[data[key].type] = []
-        }
-      }
-      for (let i = 0; i < dayRange.length; i++) {
-        for (let j = 0; j < types.length; j++) {
-          let cost = 0
-          for (let key in data) {
-            if (dayRange[i] === data[key].date && types[j] === data[key].type) {
-              cost += Number(data[key].cost)
-            }
-          }
-          datas[types[j]].push(cost)
-        }
-      }
-      let all = []
-      for (let i = 0; i < dayRange.length; i++) {
-        let allCost = 0
-        for (let j = 0; j < types.length; j++) {
-          allCost += datas[types[j]][i]
-        }
-        all.push(allCost)
-      }
-      datas.ALL = Object.assign([], all)
-      let datasets = []
-      for (let i in types) {
-        let dataset = {
-          label: types[i],
-          backgroundColor: colorList[i],
-          data: datas[types[i]]
-        }
-        datasets.push(dataset)
-      }
-      this.dailyCosts = {
-        labels: dayRange,
-        datasets: datasets
-      }
-
-      // console.log('dailyCosts', this.dailyCosts)
-      return datasets
-    },
-    getPaymentCosts (payment) {
-      let data = Object.assign({}, this.searched)
-      let types = []
-      let datas = []
-      let costs = 0
-      for (let key in data) {
-        if (String(data[key].payment) === payment) {
-          costs += Number(data[key].cost)
-          if (types.indexOf(String(data[key].type)) < 0) {
-            types.push(data[key].type)
-            datas[data[key].type] = Number(data[key].cost)
-          } else {
-            datas[data[key].type] += Number(data[key].cost)
-          }
-        }
-      }
-      let result = {
-        labels: types,
-        datasets: [
-          {
-            label: payment + ' 支払い割合',
-            backgroundColor: colorList,
-            data: Object.values(datas)
-          }
-        ]
-      }
-      this.totalCosts[payment] = costs
-      return result
-    },
-    getClass: ({ id }) => ({
-      'md-primary': id === 2,
-      'md-accent': id === 3
-    }),
-    onSelect (item) {
-      // this.selected = item
-      // console.log(item)
-      this.$emit('showEditModal', item)
     }
   },
   created () {
     this.searched = this.items
-    this.setDayObj()
-    this.fillData()
+    this.isLoading = true
   },
   watch: {
     items: function () {
       this.searched = this.items
-      this.setDayObj()
+      // this.itemFilter()
+      this.isLoading = !(Object.keys(this.items).length > 0)
     },
-    searched: function () {
-      this.fillData()
+    yearFilter: function () {
+      if (!this.yearFilter) {
+        this.monthFilter = ''
+      }
+      this.itemFilter()
+    },
+    monthFilter: function () {
+      if (!this.monthFilter) {
+        this.dayFilter = ''
+      }
+      this.itemFilter()
+    },
+    dayFilter: function () {
+      this.itemFilter()
     }
   }
 }
 </script>
 
 <style scoped>
-.md-field {
-  max-width: 300px;
-}
-.find {
-  color: #FFF;
-  font-size: 1.5vw;
-}
-.find::placeholder {
-  color: #FFF;
-  font-size: 1.5vw;
-}
-.table-header-button {
-  color: #FFF !important;
-}
-.center {
-  text-align: center !important;
-}
-.bgblack {
-  background-color: #15191f !important;
-}
 </style>
