@@ -1,24 +1,23 @@
 <template>
-  <div id="login">
-    <h1 slot="header" class="modalHeader">ログイン</h1>
-    <form slot="body" class="loginForm">
-      <p>ログインステータス: {{ loginMessage }}</p>
-      <md-field>
-        <md-icon>mail</md-icon>
-        <label>Email</label>
-        <md-input v-model="mail"></md-input>
-      </md-field>
-      <md-field>
-        <md-icon>lock</md-icon>
-        <label>パスワード</label>
-        <md-input v-model="password" type="password"></md-input>
-      </md-field>
-    </form>
-    <md-dialog-actions>
-      <md-button class="md-primary" @click="login">ログイン</md-button>
-      <md-button class="md-primary" @click="colseModal">モドル</md-button>
-    </md-dialog-actions>
-
+  <div>
+    <v-form
+      ref="form"
+      v-model="valid"
+      >
+      <v-text-field
+        v-model="auth.mail"
+        label="Email"
+        :rules="emailRules"
+        required>
+      </v-text-field>
+      <v-text-field
+        v-model="auth.password"
+        label="パスワード"
+        :type="'password'"
+        :rules="passowordRules"
+        required>
+      </v-text-field>
+    </v-form>
   </div>
 </template>
 
@@ -28,18 +27,22 @@ export default {
   name: 'login',
   data: function () {
     return {
-      mail: '',
-      password: ''
+      valid: false,
+      emailRules: [
+        v => !!v || 'Emailは必須入力です',
+        v => /.+@.+/.test(v) || 'Emailの形式にしてください'
+      ],
+      passowordRules: [
+        v => !!v || 'Passwordは必須入力です'
+      ]
     }
   },
   props: [
-    'loginState',
-    'loginMessage'
+    'auth'
   ],
   methods: {
     login () {
       this.setSnack(firebase.auth().signInWithEmailAndPassword(this.mail, this.password).then(function () {
-        // return this.setSnack('ログインに成功しました。')
         return {'msg': 'ログインに成功しました。'}
       }).catch(function (error) {
         return {'msg': 'ログインに失敗しました。ERROR_CODE: ' + error.code}

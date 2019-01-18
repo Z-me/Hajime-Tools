@@ -1,36 +1,42 @@
 <template lang="html">
-  <div class="md-layout md-gutter md-alignment-center result-field">
-    <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
-      <h3 class="center">全体支払割合</h3>
-      <DoughnutChart :width="210" :height="70" :chart-data="allGenreDonuts"></DoughnutChart>
-      <h1 class="center">{{totalCost | en}}</h1>
-    </div>
-    <div class="md-layout-item md-xlarge-size-50 md-large-size-50 md-medium-size-50 md-small-size-50 md-xsmall-size-100">
-      <h3 class="center">支払い者割合</h3>
-      <HolizontalBar :width="210" :height="70" :chart-data="paymentRate"></HolizontalBar>
-    </div>
+  <div v-if="!isLoading">
+    <v-container grid-list-md text-xs-center>
+      <v-layout align-center row wrap>
+        <v-flex xs6>
+          <h3 class="center">全体支払割合</h3>
+          <DoughnutChart :width="210" :height="70" :chart-data="allGenreDonuts"></DoughnutChart>
+          <h1 class="center">{{totalCost | en}}</h1>
+        </v-flex>
+        <v-flex xs6>
+          <h3 class="center">支払い者割合</h3>
+          <HolizontalBar :width="210" :height="70" :chart-data="paymentRate"></HolizontalBar>
+        </v-flex>
 
-    <div class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
-      <h3 class="center">支出日グラフ</h3>
-      <LineChart :width="420" :height="70" :chart-data="dailyCosts"></LineChart>
-    </div>
-    <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
-      <h1 class="center">Hajime</h1>
-      <h3 class="center">支出者別支払割合</h3>
-      <DoughnutChart :width="210" :height="100" :chart-data="paymentCosts_Hajime"></DoughnutChart>
-      <h1 class="center">{{totalCosts.Hajime | en}}</h1>
-    </div>
-    <div class="md-layout-item md-xlarge-size-10 md-large-size-10 md-medium-size-10 md-small-size-10 md-xsmall-size-100">
-      <img src="../assets/h2s.png" v-if="shareCosts < 0">
-      <h2 class="center">{{Math.abs(shareCosts) | en}}</h2>
-      <img src="../assets/s2h.png" v-if="shareCosts > 0">
-    </div>
-    <div class="md-layout-item md-xlarge-size-45 md-large-size-45 md-medium-size-45 md-small-size-45 md-xsmall-size-100">
-      <h1 class="center">Shiori</h1>
-      <h3 class="center">支出者別支払割合(Shiori)</h3>
-      <DoughnutChart :width="210" :height="100" :chart-data="paymentCosts_Shiori"></DoughnutChart>
-      <h1 class="center">{{totalCosts.Shiori | en}}</h1>
-    </div>
+        <v-flex xs12>
+          <h3 class="center">支出日グラフ</h3>
+          <LineChart :width="420" :height="70" :chart-data="dailyCosts"></LineChart>
+        </v-flex>
+
+          <v-flex xs5>
+            <h1 class="center">Hajime</h1>
+            <h3 class="center">支出者別支払割合</h3>
+            <DoughnutChart :width="210" :height="100" :chart-data="paymentCosts_Hajime"></DoughnutChart>
+            <h1 class="center">{{totalCosts.Hajime | en}}</h1>
+          </v-flex>
+          <v-flex xs2>
+            <v-img :src="require('../assets/h2s.png')" v-if="shareCosts < 0" aspect-ratio="1" contain></v-img>
+            <h2 class="center">{{Math.abs(shareCosts) | en}}</h2>
+            <v-img :src="require('../assets/s2h.png')" v-if="shareCosts > 0" aspect-ratio="1" contain></v-img>
+          </v-flex>
+          <v-flex xs5>
+            <h1 class="center">Shiori</h1>
+            <h3 class="center">支出者別支払割合(Shiori)</h3>
+            <DoughnutChart :width="210" :height="100" :chart-data="paymentCosts_Shiori"></DoughnutChart>
+            <h1 class="center">{{totalCosts.Shiori | en}}</h1>
+          </v-flex>
+
+      </v-layout>
+    </v-container>
   </div>
 </template>
 
@@ -65,7 +71,8 @@ export default {
     totalCosts: []
   }),
   props: [
-    'data'
+    'data',
+    'isLoading'
   ],
   components: {
     DoughnutChart,
@@ -74,7 +81,8 @@ export default {
   },
   filters: {
     en: function (val) {
-      return '¥ ' + val.toLocaleString()
+      let formatter = new Intl.NumberFormat('ja-JP')
+      return `¥ ${formatter.format(val)}`
     }
   },
   methods: {

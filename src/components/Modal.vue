@@ -1,24 +1,24 @@
 <template>
-  <div class="modal">
+  <div class="modalContents">
+    <v-dialog
+      v-model="show"
+      width="500px"
+      >
+      <v-card>
+        <v-card-title dark :class="modalColor">
+          <h2 style="color: white;"><slot name="title"></slot></h2>
+        </v-card-title>
 
-    <md-dialog :md-active.sync="showModal" class="modalContents">
-      <header>
-        <slot name="header"></slot>
-      </header>
-      <main>
-        <slot></slot>
-      </main>
-      <body>
-        <slot name="body"></slot>
-      </body>
-      <footer>
-        <slot name="footer"></slot>
-      </footer>
-      <md-dialog-actions>
-        <md-button class="md-raised md-primary" @click="showModal = false">Close</md-button>
-        <md-button class="md-raised" @click="showModal = false">{{message}}</md-button>
-      </md-dialog-actions>
-    </md-dialog>
+        <v-card-text>
+          <slot name="contents"></slot>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <slot name="action"></slot>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -26,11 +26,11 @@
 export default {
   name: 'modal',
   props: [
-    'show'
+    'show',
+    'modalColor'
   ],
   data: () => ({
-    showModal: false,
-    message: 'hogehoge'
+    showModal: false
   }),
   methods: {
     modalControl (state) {
@@ -46,6 +46,5 @@ export default {
   text-rendering : optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
 }
 </style>

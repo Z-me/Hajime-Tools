@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import VoiceInput from '@/components/Voice_input'
+import VoiceInput from '@/parts/VoiceInput'
 export default {
   name: 'KPT',
   data () {
