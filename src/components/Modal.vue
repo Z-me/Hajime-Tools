@@ -5,8 +5,8 @@
       width="500px"
       >
       <v-card>
-        <v-card-title primary-title class="blue lighten-2">
-          <h2><slot name="title"></slot></h2>
+        <v-card-title dark :class="modalColor">
+          <h2 style="color: white;"><slot name="title"></slot></h2>
         </v-card-title>
 
         <v-card-text>
@@ -26,7 +26,8 @@
 export default {
   name: 'modal',
   props: [
-    'show'
+    'show',
+    'modalColor'
   ],
   data: () => ({
     showModal: false

@@ -19,19 +19,19 @@
           small
           round
           color="teal accent-4"
-          v-if="!authIsLogin"
+          v-if="!isLogin"
           @click="showLogin = true"
           >
           <v-icon>assignment_ind</v-icon>
           ログイン
         </v-btn>
 
-        <v-toolbar-title v-else-if="authIsLogin">{{authEmail}}</v-toolbar-title>
+        <v-toolbar-title v-else-if="isLogin"><h3>{{`${user.user} [${user.email}]`}}</h3></v-toolbar-title>
         <v-btn
           small
           round
           color="pink darken-1"
-          v-if="authIsLogin"
+          v-if="isLogin"
           @click="showLogout = true"
           >
           <v-icon>directions_walk</v-icon>
@@ -104,7 +104,7 @@
       </v-layout>
     </div>
 
-    <modal :show="showLogin">
+    <modal :show="showLogin" modalColor="blue lighten-1">
       <div slot="title">ログイン</div>
       <login slot="contents" :auth.sync="newAuth"></login>
       <div slot="action">
@@ -112,7 +112,8 @@
         <v-btn color="pink darken-1" flat @click="showLogin = false">モドル</v-btn>
       </div>
     </modal>
-    <modal :show="showLogout">
+
+    <modal :show="showLogout" modalColor="pink darken-1">
       <div slot="title">ログアウト</div>
       <div slot="contents">
         <h2>本当にHajime-Toolからログアウトしますか?</h2>
@@ -151,11 +152,13 @@ export default {
     showLogin: false,
     showLogout: false,
     Auth: null,
+    user: {},
+    isLogin: false,
     newAuth: {
       'mail': '',
       'password': ''
     },
-    authEmail: '',
+    authUser: '',
     authIsLogin: false,
     authLoading: true,
     loginState: false,
@@ -189,14 +192,26 @@ export default {
     },
     async setAuthInfo () {
       this.Auth = await new Auth()
-      setTimeout(() => {
-        this.authEmail = this.Auth.getUser()
-        this.authIsLogin = this.Auth.checkLogin()
-        this.authLoading = false
-      }, 1000)
+      if (this.Auth.isLoading) {
+        setTimeout(() => {
+          this.Auth.getUser().then((res) => {
+            // console.log('call GetUser on menue', res)
+            this.user = res
+            this.isLogin = Boolean(res)
+            this.authLoading = false
+          })
+        }, 3000)
+      } else {
+        this.Auth.getUser().then((res) => {
+          this.user = res
+          this.isLogin = Boolean(res)
+          this.authLoading = false
+        })
+      }
+      return
     },
     showMenueItem (authShow) {
-      return authShow ? this.authIsLogin : true
+      return authShow ? this.isLogin : true
     },
     showSnackbar (type, message) {
       this.$emit('snack', type, message)

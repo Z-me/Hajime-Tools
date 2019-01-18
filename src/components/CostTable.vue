@@ -1,5 +1,6 @@
 <template>
   <div>
+    <input-dialog :openInput="openInput" @close="openInput = false"></input-dialog>
     <v-card>
       <v-card-title>
         家計簿リスト
@@ -8,7 +9,8 @@
           dark
           round
           color="teal accent-4"
-          @click="clearFilter">
+          slot="activator"
+          @click="openInput = true">
           新規登録
         </v-btn>
 
@@ -68,9 +70,10 @@
 </template>
 
 <script>
-import Chart from '../components/homebookChart'
 import moment from 'moment'
+import Chart from './homebookChart'
 import Modal from './Modal'
+import inputDialog from '@/parts/CostInput'
 
 const typeTable = {
   'utility': '光熱費',
@@ -114,6 +117,7 @@ export default {
       rowsPerPage: 10
     },
     // search: null,
+    openInput: false,
     yearFilter: '',
     monthFilter: '',
     dayFilter: '',
@@ -125,7 +129,8 @@ export default {
   ],
   components: {
     Chart,
-    Modal
+    Modal,
+    inputDialog
   },
   filters: {
     costFilter: (value) => {
@@ -134,9 +139,6 @@ export default {
     }
   },
   methods: {
-    getDateString (year, month, day) {
-      return year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day)
-    },
     setdateFormat (date) {
       return moment(new Date(date)).format('YYYY年MM月DD日')
     },

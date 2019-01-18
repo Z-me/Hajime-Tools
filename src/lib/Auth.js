@@ -2,21 +2,38 @@ import firebase from 'firebase'
 
 export default class Auth {
   constructor () {
-    firebase.auth().onAuthStateChanged(user => {
+    // this.authInfo = false
+    this.isLoading = true
+    this.setUser()
+    console.log('AUTH: ', this.authInfo)
+  }
+
+  setUser = () => {
+    firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        this.nowUser = user.email
-        this.loginState = true
+        this.isLoading = false
+        this.authInfo = {
+          'email': user.email,
+          'user': String(user.email).indexOf('3110') > 0 ? 'Hajime' : 'Shiori'
+        }
       } else {
-        this.loginState = false
+        this.authInfo = false
+        this.isLoading = false
       }
     })
   }
 
-  checkLogin () {
-    return this.loginState
+  getUser = async () => {
+    if (this.isLoading) {
+      setTimeout(() => {
+        return this.authInfo
+      }, 3000)
+    } else {
+      return this.authInfo
+    }
   }
 
-  login (mail = '', password = '') {
+  login = (mail, password) => {
     return firebase.auth().signInWithEmailAndPassword(mail, password).then(() => {
       return {
         'msg': 'ログインに成功しました。',
@@ -30,7 +47,7 @@ export default class Auth {
     })
   }
 
-  logout () {
+  logout = () => {
     return firebase.auth().signOut().then(() => {
       return {
         'msg': 'ログアウトしました。',
@@ -42,9 +59,5 @@ export default class Auth {
         'result': false
       }
     })
-  }
-
-  getUser () {
-    return this.nowUser
   }
 }
