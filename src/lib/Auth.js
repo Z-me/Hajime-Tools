@@ -5,7 +5,7 @@ export default class Auth {
     // this.authInfo = false
     this.isLoading = true
     this.setUser()
-    console.log('AUTH: ', this.authInfo)
+    // console.log('AUTH: ', this.authInfo)
   }
 
   setUser = () => {
@@ -34,30 +34,20 @@ export default class Auth {
   }
 
   login = (mail, password) => {
-    return firebase.auth().signInWithEmailAndPassword(mail, password).then(() => {
-      return {
-        'msg': 'ログインに成功しました。',
-        'result': true
-      }
-    }).catch(function (error) {
-      return {
-        'msg': `ログインに失敗しました。ERROR_CODE: ${error.code}`,
-        'result': false
-      }
+    return firebase.auth().signInWithEmailAndPassword(mail, password).then((res) => {
+      return true
+    }).catch((err) => {
+      console.log('ERROR:', err.message)
+      return false
     })
   }
 
   logout = () => {
     return firebase.auth().signOut().then(() => {
-      return {
-        'msg': 'ログアウトしました。',
-        'result': true
-      }
-    }).catch(function (error) {
-      return {
-        'msg': `ログアウトに失敗しました。ERROR_CODE: ${error}`,
-        'result': false
-      }
+      return true
+    }).catch((err) => {
+      console.log('ERROR:', err.message)
+      return false
     })
   }
 }

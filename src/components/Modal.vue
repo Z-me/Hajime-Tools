@@ -1,6 +1,7 @@
 <template>
   <div class="modalContents">
     <v-dialog
+      persistent
       v-model="show"
       width="500px"
       >
