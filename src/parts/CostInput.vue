@@ -151,7 +151,6 @@ import firebase from 'firebase'
 import firebaseConf from '../.firebaseEnv.json'
 import Auth from '@/lib/Auth'
 import Modal from '@/components/Modal'
-import customSelect from 'vue-multiselect'
 
 export default {
   name: 'TableSearch',
@@ -193,8 +192,7 @@ export default {
     'openInput'
   ],
   components: {
-    Modal,
-    customSelect
+    Modal
   },
   methods: {
     async setPayment () {
